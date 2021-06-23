@@ -1,0 +1,8 @@
+*.DS_Store
+.vscode
+*.dSYM
+*.out
+*test*
+*.a
+*.o
+webserv
