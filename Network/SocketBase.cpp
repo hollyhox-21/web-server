@@ -1,19 +1,25 @@
 #include "SocketBase.hpp"
 
-SocketBase::SocketBase(int domain, int type, int protocol, int port, u_long interface) {
+SocketBase::SocketBase(int domain, int type, int protocol, int port, u_long interface) throw() {
 	_address.sin_family = domain;
 	_address.sin_port = htons(port);
 	_address.sin_addr.s_addr = htonl(interface);
 
-	_socket = socket(domain, type, protocol);
-	testConnection();
-
-	_connection = connect(_socket, _address);
+	std::cout << "Creating Socket" << std::endl;
+	setSocket( _socket = socket(domain, type, protocol));
 }
 
-void SocketBase::testConnection() {
-	if (socket < 0)
-		throw new std::exception();
+SocketBase::~SocketBase() { }
+
+struct sockaddr_in SocketBase::getAddress() {
+	return _address;
 }
 
+int SocketBase::getSocket() {
+	return _socket;
+}
 
+void SocketBase::setSocket(int socket) {
+	if ((_socket = socket) < 0)
+		throw SocketException(strerror(errno));
+}
