@@ -11,8 +11,9 @@ class ServerSocket : public SocketBase {
 		ServerSocket(ServerSocket const & s);
 		~ServerSocket();
 
-		void connect();
-		void startListening();
+		void	connect();
+		void	startListening();
+		int		accept();
 };
 
 #endif
