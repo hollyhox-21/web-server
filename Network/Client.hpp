@@ -1,16 +1,16 @@
-#ifndef CONNECTION_HPP
-# define CONNECTION_HPP
+#ifndef CLIENT_HPP
+# define CLIENT_HPP
 
 # include "IEventHandler.hpp"
 # include <unistd.h>
 
-class Connection {
+class Client {
 	private:
 		int				_socket;
 		IEventHandler	*_eventHandler;
 	public:
-		Connection(int socket, IEventHandler *evntHnd);
-		~Connection();
+		Client(int socket, IEventHandler *evntHnd);
+		~Client();
 
 		void	sendMsg(std::string const & value);
 
