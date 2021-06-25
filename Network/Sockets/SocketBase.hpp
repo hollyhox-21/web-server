@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <netinet/in.h>
+#include <arpa/inet.h>
 #include <sys/socket.h>
 #include "../Exceptions/ServerExceptions.hpp"
 
@@ -18,7 +19,7 @@ class SocketBase {
 
 		void				setSocket(int socket);
 	public:
-		SocketBase(int domain, int type, int protocol, int port, u_long interface) throw();
+		SocketBase(const char *domain, int port) throw();
 		SocketBase(SocketBase const & s);
 		virtual ~SocketBase();
 

@@ -1,7 +1,7 @@
 #include "ServerSocket.hpp"
 
-ServerSocket::ServerSocket(int domain, int type, int protocol, int port, u_long interface, int backlog)
-	throw() : SocketBase(domain, type, protocol, port, interface) {
+ServerSocket::ServerSocket(const char *domain, int port)
+	throw() : SocketBase(domain, port) {
 	_backlog = backlog;
 	try {
 		std::cout << "Connecting" << std::endl;
@@ -28,7 +28,7 @@ void	ServerSocket::connect() {
 }
 
 void	ServerSocket::startListening() {
-	if (listen(getSocket(), _backlog))
+	if (listen(getSocket(), SOMAXCONN))
 		throw ListenException(strerror(errno));
 }
 

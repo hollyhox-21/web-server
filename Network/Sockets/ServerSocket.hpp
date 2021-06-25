@@ -5,9 +5,8 @@
 
 class ServerSocket : public SocketBase {
 	private:
-		int		_backlog;
 	public:
-		ServerSocket(int domain, int type, int protocol, int port, u_long interface, int _backlog) throw();
+		ServerSocket(const char *domain, int port) throw();
 		ServerSocket(ServerSocket const & s);
 		~ServerSocket();
 
