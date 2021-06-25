@@ -1,7 +1,7 @@
-#include "Network/Sockets/ServerSocket.hpp"
-#include "Network/Client.hpp"
-#include "Network/Request.hpp"
-#include "Network/Location.hpp"
+#include "Client.hpp"
+#include "../Sockets/ServerSocket.hpp"
+#include "../Models/Request.hpp"
+#include "../Models/Location.hpp"
 #include <vector>
 
 
