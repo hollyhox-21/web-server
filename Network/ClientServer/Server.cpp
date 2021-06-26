@@ -1,10 +1,17 @@
 #include "Server.hpp"
 
+Server::Server(std::string const & host, int port) :
+	_serverSocket(ServerSocket(host.c_str(), port)) {
+		_host = host;
+		_port = port;
+		_fdMax = _serverSocket.getSocket();
+	}
+
 Server::Server(std::string const & host, int port, std::map<int, std::string> errorPages, std::map<std::string, Location> locations) :
 	_serverSocket(ServerSocket(host.c_str(), port)) {
 		_host = host;
 		_port = port;
-		_erorPages = errorPages;
+		_errorPages = errorPages;
 		_locations = locations;
 		_fdMax = _serverSocket.getSocket();
 	}
