@@ -3,7 +3,7 @@
 Client::Client(int socket, IEventHandler *evntHnd) {
 	_socket = socket;
 	_eventHandler = evntHnd;
-	_eventHandler-> (*this);
+	_eventHandler->connectEvent(*this);
 }
 
 Client::~Client()
