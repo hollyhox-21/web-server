@@ -15,7 +15,6 @@ class SocketBase {
 		void testConnection();
 	protected:
 		struct sockaddr_in	getAddress();
-		int					getSocket();
 
 		void				setSocket(int socket);
 	public:
@@ -24,6 +23,7 @@ class SocketBase {
 		virtual ~SocketBase();
 
 		virtual void	connect() = 0;
+		int				getSocket();
 };
 
 #endif
