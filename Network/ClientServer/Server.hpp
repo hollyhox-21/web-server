@@ -5,7 +5,6 @@
 #include <vector>
 #include "Client.hpp"
 #include "../Sockets/ServerSocket.hpp"
-#include "../Models/Request.hpp"
 #include "../Models/Location.hpp"
 
 class Server : public IEventHandler {
@@ -17,7 +16,9 @@ class Server : public IEventHandler {
 		std::map<int, std::string>		_erorPages;
 		std::vector<Client*>			_clients;
 		std::map<std::string, Location>	_locations;
-		fd_set							_read_fds;
+		fd_set							_readFds;
+		fd_set							_writeFds;
+		int								_fdMax;
 
 	public:
 		Server(std::string const & host, int port, std::map<int, std::string> errorPages, std::map<std::string, Location> locations);
@@ -26,6 +27,7 @@ class Server : public IEventHandler {
 
 		void connectEvent(Client connection);
 		void disconnectEvent(Client connection);
+		void readEvent(Client connection);
 		void sendEvent(Client connection, std::string value);
 		void exceptionEvent(Client connection, std::exception e);
 };
