@@ -25,18 +25,21 @@ ServerSocket::~ServerSocket() { }
 void	ServerSocket::connect() {
 	sockaddr_in address = getAddress();
 	if (bind(getSocket(), (struct sockaddr*)&address, sizeof(address)))
-		throw ConnectionException(strerror(errno));
+		std::cout << "" << std::endl;
+		// throw ConnectionException(strerror(errno));
 }
 
 void	ServerSocket::startListening() {
 	if (listen(getSocket(), SOMAXCONN))
-		throw ListenException(strerror(errno));
+		std::cout << "" << std::endl;
+		// throw ListenException(strerror(errno));
 }
 
 int		ServerSocket::accept() {
 	sockaddr_in address = getAddress();
 	int newSocket = ::accept(getSocket(), (struct sockaddr*)&address, (socklen_t *)&address);
 	if (newSocket < 0)
-		throw SocketException(strerror(errno));
+		std::cout << "" << std::endl;
+		// throw SocketException(strerror(errno));
 	return newSocket;
 }

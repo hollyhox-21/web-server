@@ -4,7 +4,7 @@ Server::Server(std::string const & host, int port, std::map<int, std::string> er
 	_serverSocket(ServerSocket(host.c_str(), port)) {
 		_host = host;
 		_port = port;
-		_erorPages = errorPages;
+		_errorPages = errorPages;
 		_locations = locations;
 	}
 
@@ -12,7 +12,7 @@ Server::Server(std::string const & host, int port, std::map<int, std::string> er
 		std::cout << "Starting..." << std::endl;
 		while (true)
 		{
-			FD_ZERO(&_read_fds);
+			FD_ZERO(&_readFds);
 			// FD_SET(_serverSocket.getSocket(), &_read_fds);
 			// for (unsigned long i = 0; i < _clients.size(); i++)
 			// {
@@ -37,7 +37,7 @@ Server::Server(std::string const & host, int port, std::map<int, std::string> er
 		std::cout << buffer << std::endl;
 		// А тут генерирую реквест
 		std::string b(buffer);
-		Request r(b);
+		// Request r(b);
 		sendEvent(connection, "message");
 	}
 	void Server::disconnectEvent(Client connection) {
