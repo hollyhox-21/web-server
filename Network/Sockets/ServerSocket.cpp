@@ -2,7 +2,8 @@
 
 ServerSocket::ServerSocket(const char *domain, int port)
 	throw() : SocketBase(domain, port) {
-	_backlog = backlog;
+	int yes = 1;
+	setsockopt(getSocket(), SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int));
 	try {
 		std::cout << "Connecting" << std::endl;
 		connect();
