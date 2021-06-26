@@ -1,27 +1,49 @@
-#ifndef REQUEST_HPP
-#define REQUEST_HPP
+#include "request.hpp"
 
-#include <string>
+Request::Request(int fd) {
+    _printRequest(fd);
+}
 
-class Request {
-private:
-    std::string _method;
-    std::string _uri;
-    std::string _proto;
+Request::~Request() {}
 
-    std::string _head;
-    std::string _body;
+void Request::_printRequest(int fd) {
+    char buffer[BUFSIZ];
+    while (1) {
+        int n = recv(fd, buffer, BUFSIZ, 0);
+        write(1, buffer, n);
+        if (n != BUFSIZ) {
+            break;
+        }
+    }
+}
 
+int Request::_recvRequest(int fd) {
+    char buffer[BUFSIZ];
+    while (1) {
+        int n = recv(fd, buffer, BUFSIZ, 0);
+        _parsRequest(buffer, n);
+        if (n != BUFSIZ) {
+            break;
+        }
+    }
+    return 0;
+}
 
+void Request::_parsRequest(char *buffer, int size) {
+    static int state = 0;
+    if (size == 0) {
+        return;
+    }
 
-public:
-    Request(int fd);
-    ~Request();
+    switch (state) {
+        case 0:
 
-    Request() {
-        
-    };
+            break;
+        case 1:
 
-};
+            break;
+        case 2:
 
-#endif
+            break;
+    }
+}
