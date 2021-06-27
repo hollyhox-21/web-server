@@ -3,18 +3,25 @@
 
 # include "IEventHandler.hpp"
 # include <unistd.h>
+# include <sys/types.h>
+# include <sys/socket.h>
+
+# define BUFFER_SIZE 256
 
 class Client {
 	private:
 		int				_socket;
-		IEventHandler	*_eventHandler;
+		bool			_read;
 	public:
-		Client(int socket, IEventHandler *evntHnd);
+		Client(int socket);
 		~Client();
 
-		void	sendMsg(std::string const & value);
+		std::string	recvMsg();
+		void		sendMsg(std::string const & value);
+		bool		getStage();
+		void		changeStage();
 
-		int getSocket();
+		int			getSocket();
 };
 
 #endif
