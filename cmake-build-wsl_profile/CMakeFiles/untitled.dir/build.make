@@ -70,17 +70,77 @@ CMakeFiles/untitled.dir/ParseFile.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/untitled.dir/ParseFile.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /mnt/c/Users/79199/projects/untitled/ParseFile.cpp -o CMakeFiles/untitled.dir/ParseFile.cpp.s
 
+CMakeFiles/untitled.dir/Network/ClientServer/Server.cpp.o: CMakeFiles/untitled.dir/flags.make
+CMakeFiles/untitled.dir/Network/ClientServer/Server.cpp.o: ../Network/ClientServer/Server.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/c/Users/79199/projects/untitled/cmake-build-wsl_profile/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/untitled.dir/Network/ClientServer/Server.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/untitled.dir/Network/ClientServer/Server.cpp.o -c /mnt/c/Users/79199/projects/untitled/Network/ClientServer/Server.cpp
+
+CMakeFiles/untitled.dir/Network/ClientServer/Server.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/untitled.dir/Network/ClientServer/Server.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /mnt/c/Users/79199/projects/untitled/Network/ClientServer/Server.cpp > CMakeFiles/untitled.dir/Network/ClientServer/Server.cpp.i
+
+CMakeFiles/untitled.dir/Network/ClientServer/Server.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/untitled.dir/Network/ClientServer/Server.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /mnt/c/Users/79199/projects/untitled/Network/ClientServer/Server.cpp -o CMakeFiles/untitled.dir/Network/ClientServer/Server.cpp.s
+
+CMakeFiles/untitled.dir/Network/ClientServer/Client.cpp.o: CMakeFiles/untitled.dir/flags.make
+CMakeFiles/untitled.dir/Network/ClientServer/Client.cpp.o: ../Network/ClientServer/Client.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/c/Users/79199/projects/untitled/cmake-build-wsl_profile/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/untitled.dir/Network/ClientServer/Client.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/untitled.dir/Network/ClientServer/Client.cpp.o -c /mnt/c/Users/79199/projects/untitled/Network/ClientServer/Client.cpp
+
+CMakeFiles/untitled.dir/Network/ClientServer/Client.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/untitled.dir/Network/ClientServer/Client.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /mnt/c/Users/79199/projects/untitled/Network/ClientServer/Client.cpp > CMakeFiles/untitled.dir/Network/ClientServer/Client.cpp.i
+
+CMakeFiles/untitled.dir/Network/ClientServer/Client.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/untitled.dir/Network/ClientServer/Client.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /mnt/c/Users/79199/projects/untitled/Network/ClientServer/Client.cpp -o CMakeFiles/untitled.dir/Network/ClientServer/Client.cpp.s
+
+CMakeFiles/untitled.dir/Network/Sockets/ServerSocket.cpp.o: CMakeFiles/untitled.dir/flags.make
+CMakeFiles/untitled.dir/Network/Sockets/ServerSocket.cpp.o: ../Network/Sockets/ServerSocket.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/c/Users/79199/projects/untitled/cmake-build-wsl_profile/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/untitled.dir/Network/Sockets/ServerSocket.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/untitled.dir/Network/Sockets/ServerSocket.cpp.o -c /mnt/c/Users/79199/projects/untitled/Network/Sockets/ServerSocket.cpp
+
+CMakeFiles/untitled.dir/Network/Sockets/ServerSocket.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/untitled.dir/Network/Sockets/ServerSocket.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /mnt/c/Users/79199/projects/untitled/Network/Sockets/ServerSocket.cpp > CMakeFiles/untitled.dir/Network/Sockets/ServerSocket.cpp.i
+
+CMakeFiles/untitled.dir/Network/Sockets/ServerSocket.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/untitled.dir/Network/Sockets/ServerSocket.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /mnt/c/Users/79199/projects/untitled/Network/Sockets/ServerSocket.cpp -o CMakeFiles/untitled.dir/Network/Sockets/ServerSocket.cpp.s
+
+CMakeFiles/untitled.dir/Network/Sockets/SocketBase.cpp.o: CMakeFiles/untitled.dir/flags.make
+CMakeFiles/untitled.dir/Network/Sockets/SocketBase.cpp.o: ../Network/Sockets/SocketBase.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/c/Users/79199/projects/untitled/cmake-build-wsl_profile/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/untitled.dir/Network/Sockets/SocketBase.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/untitled.dir/Network/Sockets/SocketBase.cpp.o -c /mnt/c/Users/79199/projects/untitled/Network/Sockets/SocketBase.cpp
+
+CMakeFiles/untitled.dir/Network/Sockets/SocketBase.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/untitled.dir/Network/Sockets/SocketBase.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /mnt/c/Users/79199/projects/untitled/Network/Sockets/SocketBase.cpp > CMakeFiles/untitled.dir/Network/Sockets/SocketBase.cpp.i
+
+CMakeFiles/untitled.dir/Network/Sockets/SocketBase.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/untitled.dir/Network/Sockets/SocketBase.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /mnt/c/Users/79199/projects/untitled/Network/Sockets/SocketBase.cpp -o CMakeFiles/untitled.dir/Network/Sockets/SocketBase.cpp.s
+
 # Object files for target untitled
 untitled_OBJECTS = \
-"CMakeFiles/untitled.dir/ParseFile.cpp.o"
+"CMakeFiles/untitled.dir/ParseFile.cpp.o" \
+"CMakeFiles/untitled.dir/Network/ClientServer/Server.cpp.o" \
+"CMakeFiles/untitled.dir/Network/ClientServer/Client.cpp.o" \
+"CMakeFiles/untitled.dir/Network/Sockets/ServerSocket.cpp.o" \
+"CMakeFiles/untitled.dir/Network/Sockets/SocketBase.cpp.o"
 
 # External object files for target untitled
 untitled_EXTERNAL_OBJECTS =
 
 untitled: CMakeFiles/untitled.dir/ParseFile.cpp.o
+untitled: CMakeFiles/untitled.dir/Network/ClientServer/Server.cpp.o
+untitled: CMakeFiles/untitled.dir/Network/ClientServer/Client.cpp.o
+untitled: CMakeFiles/untitled.dir/Network/Sockets/ServerSocket.cpp.o
+untitled: CMakeFiles/untitled.dir/Network/Sockets/SocketBase.cpp.o
 untitled: CMakeFiles/untitled.dir/build.make
 untitled: CMakeFiles/untitled.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/mnt/c/Users/79199/projects/untitled/cmake-build-wsl_profile/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable untitled"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/mnt/c/Users/79199/projects/untitled/cmake-build-wsl_profile/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Linking CXX executable untitled"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/untitled.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

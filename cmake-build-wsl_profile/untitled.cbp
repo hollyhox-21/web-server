@@ -82,6 +82,30 @@
 				</MakeCommands>
 			</Target>
 		</Build>
+		<Unit filename="/mnt/c/Users/79199/projects/untitled/Network/ClientServer/Client.cpp">
+			<Option target="untitled"/>
+		</Unit>
+		<Unit filename="/mnt/c/Users/79199/projects/untitled/Network/ClientServer/Client.hpp">
+			<Option target="untitled"/>
+		</Unit>
+		<Unit filename="/mnt/c/Users/79199/projects/untitled/Network/ClientServer/Server.cpp">
+			<Option target="untitled"/>
+		</Unit>
+		<Unit filename="/mnt/c/Users/79199/projects/untitled/Network/ClientServer/Server.hpp">
+			<Option target="untitled"/>
+		</Unit>
+		<Unit filename="/mnt/c/Users/79199/projects/untitled/Network/Sockets/ServerSocket.cpp">
+			<Option target="untitled"/>
+		</Unit>
+		<Unit filename="/mnt/c/Users/79199/projects/untitled/Network/Sockets/ServerSocket.hpp">
+			<Option target="untitled"/>
+		</Unit>
+		<Unit filename="/mnt/c/Users/79199/projects/untitled/Network/Sockets/SocketBase.cpp">
+			<Option target="untitled"/>
+		</Unit>
+		<Unit filename="/mnt/c/Users/79199/projects/untitled/Network/Sockets/SocketBase.hpp">
+			<Option target="untitled"/>
+		</Unit>
 		<Unit filename="/mnt/c/Users/79199/projects/untitled/ParseFile.cpp">
 			<Option target="untitled"/>
 		</Unit>

@@ -123,6 +123,114 @@ untitled/fast:
 	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/build
 .PHONY : untitled/fast
 
+Network/ClientServer/Client.o: Network/ClientServer/Client.cpp.o
+
+.PHONY : Network/ClientServer/Client.o
+
+# target to build an object file
+Network/ClientServer/Client.cpp.o:
+	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/Network/ClientServer/Client.cpp.o
+.PHONY : Network/ClientServer/Client.cpp.o
+
+Network/ClientServer/Client.i: Network/ClientServer/Client.cpp.i
+
+.PHONY : Network/ClientServer/Client.i
+
+# target to preprocess a source file
+Network/ClientServer/Client.cpp.i:
+	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/Network/ClientServer/Client.cpp.i
+.PHONY : Network/ClientServer/Client.cpp.i
+
+Network/ClientServer/Client.s: Network/ClientServer/Client.cpp.s
+
+.PHONY : Network/ClientServer/Client.s
+
+# target to generate assembly for a file
+Network/ClientServer/Client.cpp.s:
+	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/Network/ClientServer/Client.cpp.s
+.PHONY : Network/ClientServer/Client.cpp.s
+
+Network/ClientServer/Server.o: Network/ClientServer/Server.cpp.o
+
+.PHONY : Network/ClientServer/Server.o
+
+# target to build an object file
+Network/ClientServer/Server.cpp.o:
+	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/Network/ClientServer/Server.cpp.o
+.PHONY : Network/ClientServer/Server.cpp.o
+
+Network/ClientServer/Server.i: Network/ClientServer/Server.cpp.i
+
+.PHONY : Network/ClientServer/Server.i
+
+# target to preprocess a source file
+Network/ClientServer/Server.cpp.i:
+	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/Network/ClientServer/Server.cpp.i
+.PHONY : Network/ClientServer/Server.cpp.i
+
+Network/ClientServer/Server.s: Network/ClientServer/Server.cpp.s
+
+.PHONY : Network/ClientServer/Server.s
+
+# target to generate assembly for a file
+Network/ClientServer/Server.cpp.s:
+	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/Network/ClientServer/Server.cpp.s
+.PHONY : Network/ClientServer/Server.cpp.s
+
+Network/Sockets/ServerSocket.o: Network/Sockets/ServerSocket.cpp.o
+
+.PHONY : Network/Sockets/ServerSocket.o
+
+# target to build an object file
+Network/Sockets/ServerSocket.cpp.o:
+	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/Network/Sockets/ServerSocket.cpp.o
+.PHONY : Network/Sockets/ServerSocket.cpp.o
+
+Network/Sockets/ServerSocket.i: Network/Sockets/ServerSocket.cpp.i
+
+.PHONY : Network/Sockets/ServerSocket.i
+
+# target to preprocess a source file
+Network/Sockets/ServerSocket.cpp.i:
+	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/Network/Sockets/ServerSocket.cpp.i
+.PHONY : Network/Sockets/ServerSocket.cpp.i
+
+Network/Sockets/ServerSocket.s: Network/Sockets/ServerSocket.cpp.s
+
+.PHONY : Network/Sockets/ServerSocket.s
+
+# target to generate assembly for a file
+Network/Sockets/ServerSocket.cpp.s:
+	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/Network/Sockets/ServerSocket.cpp.s
+.PHONY : Network/Sockets/ServerSocket.cpp.s
+
+Network/Sockets/SocketBase.o: Network/Sockets/SocketBase.cpp.o
+
+.PHONY : Network/Sockets/SocketBase.o
+
+# target to build an object file
+Network/Sockets/SocketBase.cpp.o:
+	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/Network/Sockets/SocketBase.cpp.o
+.PHONY : Network/Sockets/SocketBase.cpp.o
+
+Network/Sockets/SocketBase.i: Network/Sockets/SocketBase.cpp.i
+
+.PHONY : Network/Sockets/SocketBase.i
+
+# target to preprocess a source file
+Network/Sockets/SocketBase.cpp.i:
+	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/Network/Sockets/SocketBase.cpp.i
+.PHONY : Network/Sockets/SocketBase.cpp.i
+
+Network/Sockets/SocketBase.s: Network/Sockets/SocketBase.cpp.s
+
+.PHONY : Network/Sockets/SocketBase.s
+
+# target to generate assembly for a file
+Network/Sockets/SocketBase.cpp.s:
+	$(MAKE) -f CMakeFiles/untitled.dir/build.make CMakeFiles/untitled.dir/Network/Sockets/SocketBase.cpp.s
+.PHONY : Network/Sockets/SocketBase.cpp.s
+
 ParseFile.o: ParseFile.cpp.o
 
 .PHONY : ParseFile.o
@@ -159,6 +267,18 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... untitled"
+	@echo "... Network/ClientServer/Client.o"
+	@echo "... Network/ClientServer/Client.i"
+	@echo "... Network/ClientServer/Client.s"
+	@echo "... Network/ClientServer/Server.o"
+	@echo "... Network/ClientServer/Server.i"
+	@echo "... Network/ClientServer/Server.s"
+	@echo "... Network/Sockets/ServerSocket.o"
+	@echo "... Network/Sockets/ServerSocket.i"
+	@echo "... Network/Sockets/ServerSocket.s"
+	@echo "... Network/Sockets/SocketBase.o"
+	@echo "... Network/Sockets/SocketBase.i"
+	@echo "... Network/Sockets/SocketBase.s"
 	@echo "... ParseFile.o"
 	@echo "... ParseFile.i"
 	@echo "... ParseFile.s"

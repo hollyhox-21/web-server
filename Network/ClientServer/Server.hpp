@@ -31,7 +31,6 @@ class Server : public IEventHandler {
 		void setErrorPages(std::map<int, std::string> &);
 		void setClients(std::vector<Client*> &);
 		void setLocations(std::map<std::string, Location> &);
-		void setRead_fds(int);
 		void connectEvent(Client connection);
 		void disconnectEvent(Client connection);
 		void sendEvent(Client connection, std::string value);

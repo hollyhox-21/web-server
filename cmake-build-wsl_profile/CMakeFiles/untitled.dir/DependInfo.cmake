@@ -4,6 +4,10 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
+  "/mnt/c/Users/79199/projects/untitled/Network/ClientServer/Client.cpp" "/mnt/c/Users/79199/projects/untitled/cmake-build-wsl_profile/CMakeFiles/untitled.dir/Network/ClientServer/Client.cpp.o"
+  "/mnt/c/Users/79199/projects/untitled/Network/ClientServer/Server.cpp" "/mnt/c/Users/79199/projects/untitled/cmake-build-wsl_profile/CMakeFiles/untitled.dir/Network/ClientServer/Server.cpp.o"
+  "/mnt/c/Users/79199/projects/untitled/Network/Sockets/ServerSocket.cpp" "/mnt/c/Users/79199/projects/untitled/cmake-build-wsl_profile/CMakeFiles/untitled.dir/Network/Sockets/ServerSocket.cpp.o"
+  "/mnt/c/Users/79199/projects/untitled/Network/Sockets/SocketBase.cpp" "/mnt/c/Users/79199/projects/untitled/cmake-build-wsl_profile/CMakeFiles/untitled.dir/Network/Sockets/SocketBase.cpp.o"
   "/mnt/c/Users/79199/projects/untitled/ParseFile.cpp" "/mnt/c/Users/79199/projects/untitled/cmake-build-wsl_profile/CMakeFiles/untitled.dir/ParseFile.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")

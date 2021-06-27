@@ -1,1 +1,1 @@
-/usr/bin/c++  -g   CMakeFiles/untitled.dir/ParseFile.cpp.o  -o untitled 
+/usr/bin/c++  -g   CMakeFiles/untitled.dir/ParseFile.cpp.o CMakeFiles/untitled.dir/Network/ClientServer/Server.cpp.o CMakeFiles/untitled.dir/Network/ClientServer/Client.cpp.o CMakeFiles/untitled.dir/Network/Sockets/ServerSocket.cpp.o CMakeFiles/untitled.dir/Network/Sockets/SocketBase.cpp.o  -o untitled 

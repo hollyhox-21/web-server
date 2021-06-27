@@ -18,7 +18,7 @@ class SocketBase {
 
 		void				setSocket(int socket);
 	public:
-		SocketBase();
+		SocketBase() {}
 		SocketBase(const char *domain, int port) throw();
 		SocketBase(SocketBase const & s);
 		virtual ~SocketBase();
