@@ -28,10 +28,9 @@ Server::Server(std::string const & host, int port, std::map<int, std::string> er
 			{
 				if (_fdMax < _clients[i]->getSocket())
 					_fdMax = _clients[i]->getSocket();
+				FD_SET(_clients[i]->getSocket(), &_readFds);
 				if (_clients[i]->getStage() == true) {
 					std::cout << "Stage reading..." << _clients[i]->getSocket() << std::endl;
-					FD_SET(_clients[i]->getSocket(), &_readFds);
-					_clients[i]->changeStage();
 				} else {
 					std::cout << "Stage writing..." << _clients[i]->getSocket() << std::endl;
 					_clients[i]->changeStage();
@@ -46,6 +45,7 @@ Server::Server(std::string const & host, int port, std::map<int, std::string> er
 			for (unsigned long i = 0; i < _clients.size(); i++) {
 				if (FD_ISSET(_clients[i]->getSocket(), &_readFds)) {
 					readEvent(*_clients[i]);
+					_clients[i]->changeStage();
 				} else if (FD_ISSET(_clients[i]->getSocket(), &_writeFds)) {
 					sendEvent(*_clients[i], "");
 					disconnectEvent(*_clients[i], i);
@@ -57,7 +57,6 @@ Server::Server(std::string const & host, int port, std::map<int, std::string> er
 				_clients.push_back(client);
 				connectEvent(*client);
 			}
-			
 		}
 	}
 

@@ -7,7 +7,7 @@ Client::Client(int socket) {
 
 Client::~Client() {
 	std::cout << _socket << "Ya umer!" << std::endl;
-	// close(_socket);
+	close(_socket);
 }
 
 std::string Client::recvMsg() {
@@ -16,6 +16,7 @@ std::string Client::recvMsg() {
 	int nDataLength;
 
 	do {
+		// Если вернет 0 то закрыли соединение
 		nDataLength = recv(getSocket(), buffer, BUFFER_SIZE, 0);
 		if (nDataLength == -1)
 		{
