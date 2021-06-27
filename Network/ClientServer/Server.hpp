@@ -7,6 +7,7 @@
 #include "../Sockets/ServerSocket.hpp"
 #include "../Models/Location.hpp"
 
+
 class Server : public IEventHandler {
 	private:
 		ServerSocket					_serverSocket;
@@ -29,9 +30,9 @@ class Server : public IEventHandler {
 		void setErorPages(std::map<int, std::string> errorPages) { _errorPages = errorPages; }
 		void setLocations(std::map<std::string, Location> locations) { _locations = locations; }
 
-		void connectEvent(Client connection);
-		void disconnectEvent(Client connection);
-		void readEvent(Client connection);
-		void sendEvent(Client connection, std::string value);
-		void exceptionEvent(Client connection, std::exception e);
+		void connectEvent(Client & connection);
+		void disconnectEvent(Client & connection, int index);
+		void readEvent(Client & connection);
+		void sendEvent(Client & connection, std::string value);
+		void exceptionEvent(Client & connection, std::exception e);
 };
