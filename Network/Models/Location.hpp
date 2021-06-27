@@ -9,6 +9,7 @@ struct Location
 	std::map<std::string, bool>	methods;
 	std::string					root;
 	std::string					pathCgi;
+	std::string					index;
 };
 
 

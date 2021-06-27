@@ -6,9 +6,10 @@ server:
 
 	location: /
 		client_body_buffer_size: 8k or 16k
-		request_method: GET POST DELETE
+		allow_methods: GET POST DELETE
 		root: /data/www
 		path_cgi: /bin/cgi
+		
 	location: /data
 		
 server:

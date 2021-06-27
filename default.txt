@@ -1,0 +1,27 @@
+server:
+    host: 127.0.0.1
+    port: 8080
+    server_name: localhost
+    error_page:	404 error_page.html
+
+	location: /
+    	root:			/Users/flavon/Desktop/webserv/files/
+    	index:			index.html
+    	allow_methods:	GET
+
+	location: /put_test
+		root:			/Users/flavon/Desktop/webserv/files/
+		allow_methods:	PUT
+
+	location: /post_body
+		root:						/Users/flavon/Desktop/webserv/files/
+		allow_methods:				POST
+		cgi_path:					.bla /Users/flavon/Desktop/webserv/test/cgi_tester
+		limits_client_body_size:	100
+
+	location: /directory
+		root:			/Users/flavon/Desktop/webserv/test/YoupiBanane
+		index:			youpi.bad_extension
+		allow_methods:	GET POST
+		cgi_path:		.bla /Users/flavon/Desktop/webserv/test/cgi_tester
+
