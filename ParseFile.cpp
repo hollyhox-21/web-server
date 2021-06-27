@@ -24,7 +24,6 @@ int main(int ac, char **av)
         while (getline(file, line) && line.find("server:") == std::string::npos)
         {
             ser.push_back(line);
-            // std::cout << line << std::endl;
         }
         if (file.fail())
         {
@@ -40,11 +39,56 @@ int main(int ac, char **av)
     }
     for (int i = 0; i < servs.size(); ++i)
     {
-           std::cout << servs[i].size() << std::endl;
            for (int j = 0; j < servs[i].size(); ++j)
-           {
-               std::cout << servs[i][j] << std::endl;
-           }
+		   {
+           		std::string line = servs[i][j];
+			   if (line == "server:")
+			   {
+				   // if (sflg == 1)
+				   // {
+				   // 	s.setLocations(location);
+				   // 	serv.push_back(s);
+				   // }
+				   // s = Server();
+				   sflg = 1;
+				   lflg = 0;
+				   std::cout << "server find" << std::endl;
+			   }
+			   else if (sflg == 1 && line[0] == '\t')
+			   {
+				   lflg = 1;
+				   line.erase(0, 1);
+				   if (line.find("server_name:") != std::string::npos)
+				   {
+					   line = pars_one_arg(line);
+					   std::cout << line << std::endl;
+					   // s.setName(line);
+				   }
+				   else if (line.find("host:") != std::string::npos)
+				   {
+					   line = pars_one_arg(line);
+					   std::cout << line << std::endl;
+					   // s.setHost(line);
+				   }
+				   else if (line.find("port:") != std::string::npos)
+				   {
+					   line = pars_one_arg(line);
+					   std::cout << line << std::endl;
+					   // s.setPort(atoi(const_cast<char*>(line.c_str())));
+				   }
+				   else if (line.find("location:") != std::string::npos)
+				   {
+					   lflg = 1;
+					   line = pars_one_arg(line);
+					   std::cout << line << std::endl;
+					   locPath = line;
+				   }
+			   }
+			   else if (sflg == 1 && lflg == 1 && line[0] == '\t' && line[1] == '\t')
+			   {
+			   }
+		   }
+	}
     }
     return 0;
 }

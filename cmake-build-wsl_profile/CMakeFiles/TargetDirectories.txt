@@ -1,0 +1,3 @@
+/mnt/c/Users/79199/projects/untitled/cmake-build-wsl_profile/CMakeFiles/edit_cache.dir
+/mnt/c/Users/79199/projects/untitled/cmake-build-wsl_profile/CMakeFiles/rebuild_cache.dir
+/mnt/c/Users/79199/projects/untitled/cmake-build-wsl_profile/CMakeFiles/untitled.dir

@@ -1,0 +1,20 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/mnt/c/Users/79199/projects/untitled/ParseFile.cpp
+vector
+-
+iostream
+-
+fstream
+-
+string
+-
+algorithm
+-
+
