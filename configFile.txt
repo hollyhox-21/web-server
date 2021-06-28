@@ -1,0 +1,21 @@
+server:
+	server_name:ola          
+	host: 127.0.0.1
+	port: 8080
+	error_page: 404 /custom_error/page_404.html
+
+	location: /
+		client_body_buffer_size: 8k or 16k
+		index: index.html
+		allow_methods: GET POST DELETE
+		root: /data/www
+		path_cgi: /bin/cgi
+
+	location: /data
+
+server:
+	location:
+
+	location:
+
+server:

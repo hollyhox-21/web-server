@@ -21,5 +21,6 @@ int SocketBase::getSocket() {
 
 void SocketBase::setSocket(int socket) {
 	if ((_socket = socket) < 0)
-		throw SocketException(strerror(errno));
+		NULL;
+//		throw SocketException(strerror(errno));
 }
