@@ -16,171 +16,75 @@ Server::Server(std::string const & host, int port, std::map<int, std::string> er
 		_fdMax = _serverSocket.getSocket();
 	}
 
-void Server::run ()
-{
-	std::cout << "Starting..." << std::endl;
-	while (true)
-	{
-		FD_ZERO(&_readFds);
-		FD_ZERO(&_writeFds);
-		FD_SET(_serverSocket.getSocket(), &_readFds);
-		FD_SET(_serverSocket.getSocket(), &_writeFds);
-		for (unsigned long i = 0; i < _clients.size(); i++)
+	void Server::run () {
+		std::cout << "Starting..." << std::endl;
+		while (true)
 		{
-			FD_SET(_clients[i]->getSocket(), &_readFds);
-			FD_SET(_clients[i]->getSocket(), &_writeFds);
-		}
-
-		if (select(_fdMax + 1, &_readFds, &_writeFds, NULL, NULL) == -1)
-		{
-			perror("select");
-			exit(4);
-		}
-		if (FD_ISSET(_serverSocket.getSocket(), &_readFds))
-		{
-			_clients.push_back(new Client(_serverSocket.accept(), this));
-			FD_SET(_clients[_clients.size() - 1]->getSocket(), &_readFds);
-		}
-		for (unsigned long i = 0; i < _clients.size(); i++)
-		{
-			if (FD_ISSET(_clients[i]->getSocket(), &_readFds))
+			FD_ZERO(&_readFds);
+			FD_ZERO(&_writeFds);
+			FD_SET(_serverSocket.getSocket(), &_readFds);
+			_fdMax = _serverSocket.getSocket();
+			for (unsigned long i = 0; i < _clients.size(); i++)
 			{
-				readEvent(*_clients[i]);
-				sendEvent(*_clients[i], "value");
+				if (_fdMax < _clients[i]->getSocket())
+					_fdMax = _clients[i]->getSocket();
+				FD_SET(_clients[i]->getSocket(), &_readFds);
+				if (_clients[i]->getStage() == true) {
+					std::cout << "Stage reading..." << _clients[i]->getSocket() << std::endl;
+				} else {
+					std::cout << "Stage writing..." << _clients[i]->getSocket() << std::endl;
+					_clients[i]->changeStage();
+					FD_SET(_clients[i]->getSocket(), &_writeFds);
+				}
 			}
-			// else if (FD_ISSET(_clients[i]->getSocket(), &_readFds)) {
-			// 	sendEvent(*_clients[i], "value");
-			// }
+			std::cout << "select" << std::endl;
+			if (select(_fdMax + 1, &_readFds, &_writeFds, NULL, NULL) == -1) {
+				perror("select");
+				_exit(4);
+			}
+			for (unsigned long i = 0; i < _clients.size(); i++) {
+				if (FD_ISSET(_clients[i]->getSocket(), &_readFds)) {
+					readEvent(*_clients[i]);
+					_clients[i]->changeStage();
+				} else if (FD_ISSET(_clients[i]->getSocket(), &_writeFds)) {
+					sendEvent(*_clients[i], "");
+				}
+			}
+			if (FD_ISSET(_serverSocket.getSocket(), &_readFds))
+			{
+				Client *client = new Client(_serverSocket.accept());
+				_clients.push_back(client);
+				connectEvent(*client);
+			}
 		}
-
 	}
-}
 
-void Server::connectEvent(Client connection) {
-	connection.getSocket();
-	std::cout << "Connected" << std::endl;
-
+	void Server::connectEvent(Client & connection) {
+		std::cout << "Connected " << connection.getSocket() << std::endl;
 	}
-void Server::readEvent(Client connection) {
-	// Я тут считываю в баффер
-	char buffer[30000];
-	recv(connection.getSocket(), buffer, 30000, 0);
-	std::cout << buffer << std::endl;
-	// А тут генерирую реквест
-	std::string b(buffer);
-}
-void Server::disconnectEvent(Client connection) {
-	close(connection.getSocket());
-	std::cout << "Disconnected" << std::endl;
-}
-void Server::sendEvent(Client connection, std::string value) {
-	connection.sendMsg("HTTP/1.1 200 OK\nDate: Mon, 27 Jul 2009 12:28:53 GMT\nServer: Apache/2.2.14 (Win32)\nLast-Modified: Wed, 22 Jul 2009 19:15:56 GMT\nContent-Length: 12\nContent-Type: text/html\nClient: Closed\n\nHello world!");
-	std::cout << "Msg: " << value << std::endl;
-	disconnectEvent(connection);
-}
-void Server::exceptionEvent(Client connection, std::exception e) {
-	connection.getSocket();
-	std::cout << "Error: " << e.what() << std::endl;
-}
-
-
-//	// Я тут считываю в баффер
-//	char buffer[30000];
-//	recv(connection.getSocket(), buffer, 30000, 0);
-//	std::cout << buffer << std::endl;
-//	// А тут генерирую реквест
-//	std::string b(buffer);
-//	// Request r(b);
-//	sendEvent(connection, "message");
-//}
-
-
-void Server::setName(std::string name)
-{
-	_name = name;
-}
-
-void Server::setHost(std::string host)
-{
-	_host = host;
-}
-
-void Server::setPort(int port)
-{
-	_port = port;
-}
-
-void Server::setErrorPages(std::map<int, std::string> & errorPages)
-{
-	_errorPages = errorPages;
-}
-
-void Server::setLocations(std::map<std::string, Location> & location)
-{
-	_locations = location;
-}
-
-void Server::setClients(std::vector<Client *> & clients)
-{
-	_clients = clients;
-}
-
-void Server::setServerSocket(ServerSocket &serverSocket)
-{
-	_serverSocket = serverSocket;
-}
-
-const ServerSocket &Server::getServerSocket() const
-{
-	return _serverSocket;
-}
-
-const std::string &Server::getName() const
-{
-	return _name;
-}
-
-const std::string &Server::getHost() const
-{
-	return _host;
-}
-
-int Server::getPort() const
-{
-	return _port;
-}
-
-const std::map<int, std::string> &Server::getErrorPages() const
-{
-	return _errorPages;
-}
-
-const std::vector<Client *> &Server::getClients() const
-{
-	return _clients;
-}
-
-const std::map<std::string, Location> &Server::getLocations() const
-{
-	return _locations;
-}
-
-const fd_set &Server::getReadFds() const
-{
-	return _readFds;
-}
-
-const fd_set &Server::getWriteFds() const
-{
-	return _writeFds;
-}
-
-int Server::getFdMax() const
-{
-	return _fdMax;
-}
-
-Server::Server(): _serverSocket(ServerSocket()), _port(0), _fdMax(0), _name(""), _host("")
-{
-
-}
+	void Server::readEvent(Client & connection) {
+		std::cout << "Reading " << connection.getSocket() << std::endl;
+		int ret = connection.recvMsg();
+		if (ret == -2)
+			std::cout << connection.getMessage();
+		else if (ret == 0)
+		{
+			for (size_t i = 0; i < _clients.size(); i++) {
+				if (_clients[i]->getSocket() == connection.getSocket())
+					disconnectEvent(connection, i);
+			}
+		}
+	}
+	void Server::disconnectEvent(Client & connection, int index) {
+		std::cout << "Disconnected " << connection.getSocket() << std::endl;
+		delete(_clients[index]);
+		_clients.erase(_clients.begin() + index);
+	}
+	void Server::sendEvent(Client & connection, std::string value) {
+		std::cout << "Msg: " << connection.getSocket() << value << std::endl;
+		connection.sendMsg("HTTP/1.1 200 OK\nDate: Mon, 27 Jul 2009 12:28:53 GMT\nServer: Apache/2.2.14 (Win32)\nLast-Modified: Wed, 22 Jul 2009 19:15:56 GMT\nContent-Length: 12\nContent-Type: text/html\nClient: Closed\n\nHello world!");
+	}
+	void Server::exceptionEvent(Client & connection, std::exception e) {
+		connection.getSocket();
+		std::cout << "Error: " << e.what() << std::endl;
+	}
