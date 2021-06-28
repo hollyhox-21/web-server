@@ -24,15 +24,11 @@ public:
 	Server(std::string const & host, int port);
 	Server(std::string const & host, int port, std::map<int, std::string> errorPages, std::map<std::string, Location> locations);
 	void run ();
-
-	void setErorPages(std::map<int, std::string> errorPages) { _errorPages = errorPages; }
-	void setLocations(std::map<std::string, Location> locations) { _locations = locations; }
-
-	void connectEvent(Client & connection);
+	void connectEvent(Client &connection);
 	void disconnectEvent(Client & connection, int index);
-	void readEvent(Client & connection);
-	void sendEvent(Client & connection, std::string value);
-	void exceptionEvent(Client & connection, std::exception e);
+	void readEvent(Client &connection);
+	void sendEvent(Client &connection, std::string value);
+	void exceptionEvent(Client &connection, std::exception e);
 	Server();
 	virtual ~Server() { };
 	void setServerSocket(ServerSocket &);
