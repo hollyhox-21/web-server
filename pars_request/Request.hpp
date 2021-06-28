@@ -7,6 +7,7 @@
 #include <sys/socket.h>
 #include <string>
 #include <map>
+#include <iostream>
 
 #define CRLF "\r\n"
 
@@ -16,16 +17,17 @@ private:
     std::string _uri;
     std::string _proto;
 
-    std::map<std::string, std::string>  _head;
+    std::map<std::string, std::string>  _headers;
     std::string                         _body;
-
-    Request();
+	
+	size_t	_findNth(const std::string & str , unsigned int N, const std::string & find);
     int     _recvRequest(int fd);
-    void    _parsRequest(char *buffer, int size);
-    void    _printRequest(int fd);
+    void    _parsRequest(std::string & buffer, int size);
 public:
-    Request(int fd);
-    ~Request();
+	Request(std::string &buffer, int size);
+	~Request();
+	
+	void    printRequest();
 
 
 
