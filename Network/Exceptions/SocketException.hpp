@@ -7,13 +7,17 @@
 
 class SocketException : public std::exception {
 	private:
-		std::string		_message;
+		char			*_result;
 	public:
-		SocketException(char *msg) throw() : std::exception() { _message = msg; }
+		SocketException(char *msg) throw() : std::exception() {
+			std::string total = std::string("Socket Exception: ") + msg;
+			_result = strdup(total.c_str());
+		}
+		virtual ~SocketException() throw() {
+			delete(_result);
+		}
 		virtual const char* what() const throw() {
-			std::string total = std::string("Socket Exception: ") + _message;
-			const char *result = strdup(total.c_str());
-			return result;
+			return _result;
 		}
 };
 
