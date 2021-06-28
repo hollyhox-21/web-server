@@ -40,7 +40,7 @@ Server::Server(std::string const & host, int port, std::map<int, std::string> er
 			std::cout << "select" << std::endl;
 			if (select(_fdMax + 1, &_readFds, &_writeFds, NULL, NULL) == -1) {
 				perror("select");
-				exit(4);
+				_exit(4);
 			}
 			for (unsigned long i = 0; i < _clients.size(); i++) {
 				if (FD_ISSET(_clients[i]->getSocket(), &_readFds)) {
@@ -48,7 +48,6 @@ Server::Server(std::string const & host, int port, std::map<int, std::string> er
 					_clients[i]->changeStage();
 				} else if (FD_ISSET(_clients[i]->getSocket(), &_writeFds)) {
 					sendEvent(*_clients[i], "");
-					disconnectEvent(*_clients[i], i);
 				}
 			}
 			if (FD_ISSET(_serverSocket.getSocket(), &_readFds))
@@ -65,12 +64,21 @@ Server::Server(std::string const & host, int port, std::map<int, std::string> er
 	}
 	void Server::readEvent(Client & connection) {
 		std::cout << "Reading " << connection.getSocket() << std::endl;
-		std::cout << connection.recvMsg();
+		int ret = connection.recvMsg();
+		if (ret == -2)
+			std::cout << connection.getMessage();
+		else if (ret == 0)
+		{
+			for (size_t i = 0; i < _clients.size(); i++) {
+				if (_clients[i]->getSocket() == connection.getSocket())
+					disconnectEvent(connection, i);
+			}
+		}
 	}
 	void Server::disconnectEvent(Client & connection, int index) {
 		std::cout << "Disconnected " << connection.getSocket() << std::endl;
 		delete(_clients[index]);
-		_clients.erase(_clients.cbegin() + index);
+		_clients.erase(_clients.begin() + index);
 	}
 	void Server::sendEvent(Client & connection, std::string value) {
 		std::cout << "Msg: " << connection.getSocket() << value << std::endl;
