@@ -12,16 +12,18 @@ class Client {
 	private:
 		int				_socket;
 		bool			_read;
+		std::string		_message;
 	public:
 		Client(int socket);
 		~Client();
 
-		std::string	recvMsg();
-		void		sendMsg(std::string const & value);
-		bool		getStage();
-		void		changeStage();
+		int				recvMsg();
+		void			sendMsg(std::string const & value);
+		void			changeStage();
 
-		int			getSocket();
+		std::string		getMessage();
+		int				getSocket();
+		bool			getStage();
 };
 
 #endif
