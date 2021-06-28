@@ -43,3 +43,8 @@ int		ServerSocket::accept() {
 		// throw SocketException(strerror(errno));
 	return newSocket;
 }
+
+ServerSocket::ServerSocket(const ServerSocket &s)
+{
+
+}

@@ -1,5 +1,5 @@
 #include <vector>
- #include "Network/ClientServer/Server.hpp"
+#include "Network/ClientServer/Server.hpp"
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -61,65 +61,82 @@ int main(int ac, char **av)
 	std::vector<Server> serv = std::vector<Server>();
 	for (int i = 0; i < servs.size(); ++i)
 	{
+		if (i == 3)
+			NULL;
 		int lflg = 0;
 		std::string locPath;
 		std::map<std::string, Location> location;
+		std::map<int, std::string> erPage;
 		Location loc;
-		Server s;
+		Server s = Server();
 		for (int j = 0; j < servs[i].size(); ++j)
 		{
-			std::string line = servs[i][j];
+			line = servs[i][j];
+			if (line[0] == ' '){
+				std::cout << "Space in config in line: " << i * j << std::endl;
+			}
 			if (line[0] == '\t' && line[1] != '\t')
 			{
 				line.erase(0, 1);
 				if (line.find("server_name:") != std::string::npos)
 				{
 					line = pars_one_arg(line);
-					std::cout << line << std::endl;
 					s.setName(line);
 				}
 				else if (line.find("host:") != std::string::npos)
 				{
 					line = pars_one_arg(line);
-					std::cout << line << std::endl;
-					 s.setHost(line);
+					s.setHost(line);
 				}
 				else if (line.find("port:") != std::string::npos)
 				{
 					line = pars_one_arg(line);
-					std::cout << line << std::endl;
-					 s.setPort(atoi(const_cast<char*>(line.c_str())));
+					s.setPort(atoi(line.c_str()));
+				}
+				else if (line.find("error_page:") != std::string::npos)
+				{
+					std::string first, second;
+					line.erase(0, line.find(":") + 1);
+					line.erase(0, line.find_first_not_of(" \t"));
+					int l;
+					if ((l = line.find(" ")) != -1)
+					{
+						first = std::string(line);
+						second = std::string(line);
+						first.erase(l, line.length());
+						second.erase(0, l + 1);
+						second.erase(0, second.find_first_not_of(" \t"));
+						if ((l = second.find_first_of(" \t")) != -1)
+							second.erase(l, second.length());
+					}
+					erPage.insert(std::pair<int, std::string>(atoi(first.c_str()), second));
+					s.setErrorPages(erPage);
 				}
 				else if (line.find("location:") != std::string::npos)
 				{
 					lflg = 1;
 					line = pars_one_arg(line);
-					std::cout << line << std::endl;
 					locPath = line;
 				}
 			}
 			else if (lflg == 1 && line[0] == '\t' && line[1] == '\t')
 			{
+				if (i == 3)
+					NULL;
 				if (line.find("root:") != std::string::npos)
 				{
 					line = pars_one_arg(line);
-					std::cout << line << std::endl;
-					loc.root = line;
-					 s.setHost(line);
+					loc.root = std::string(line);
 				}
 				else if (line.find("path_cgi:") != std::string::npos)
 				{
 					line = pars_one_arg(line);
-					std::cout << line << std::endl;
-					loc.pathCgi = line;
-					 s.setHost(line);
+					loc.pathCgi = std::string(line);
 				}
 				else if (line.find("index:") != std::string::npos)
 				{
 					line = pars_one_arg(line);
-					std::cout << line << std::endl;
-					loc.index = line;
-					 s.setHost(line);
+					loc.index = std::string(line);
 				}
 				else if (line.find("allow_methods:") != std::string::npos)
 				{
@@ -132,16 +149,50 @@ int main(int ac, char **av)
 						methods.insert(std::make_pair<std::string, bool>("POST", 1));
 					if (line.find("DELETE") != std::string::npos)
 						methods.insert(std::make_pair<std::string, bool>("DELETE", 1));
-					std::cout << line << std::endl;
 					loc.methods = methods;
 				}
 			}
-			else if (lflg == 1 && line == "")
+			if (i == 3 && j == 23)
+				NULL;
+			else if ((lflg == 1 && line.empty()) || (lflg == 1 && j == servs[i].size() - 1))
 			{
 				lflg = 0;
 				location.insert(std::make_pair(locPath, loc));
+				loc.reset();
+				s.setLocations(location);
 			}
 		}
+		serv.push_back(s);
 	}
+	for (int i = 0; i < serv.size(); ++i)
+	{
+		std::cout << "server:" << std::endl;
+		std::cout << "\tserver_name: " << serv[i].getName() << std::endl;
+		std::cout << "\thost: " << serv[i].getHost() << std::endl;
+		std::cout << "\tport: " << serv[i].getPort() << std::endl;
+		std::map<int, std::string> ep = serv[i].getErrorPages();
+		std::map<int, std::string>::iterator ite = ep.begin();
+		while (ite != ep.end())
+			std::cout << "\terror_page: " << ite->first << " " << ite++->second << std::endl;
+		std::map<std::string, Location> ms = serv[i].getLocations();
+		std::map<std::string, Location>::iterator itl = ms.begin();
+		while (itl != ms.end())
+		{
+			std::cout << "\tlocation: " << itl->first << std::endl;
+			std::cout << "\t\tindex: " << itl->second.index << std::endl;
+			std::cout << "\t\tpath_cgi: " << itl->second.pathCgi << std::endl;
+			std::cout << "\t\troot: " << itl->second.root << std::endl;
+			std::map<std::string, bool> met = itl->second.methods;
+			std::map<std::string, bool>::iterator itm = met.begin();
+			if (met.size())
+				std::cout << "\t\tallow_methods: ";
+			while (itm != met.end())
+				std::cout << itm++->first << " ";
+			if (met.size())
+				std::cout << std::endl;
+			itl++;
+		}
+	}
+	file.close();
 	return 0;
 }
