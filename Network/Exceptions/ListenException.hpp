@@ -7,13 +7,17 @@
 
 class ListenException : public std::exception {
 	private:
-		std::string		_message;
+		char			*_result;
 	public:
-		ListenException(char *msg) throw() : std::exception() { _message = msg; }
+		ListenException(char *msg) throw() : std::exception() {
+			std::string total = std::string("Listen Exception: ") + msg;
+			_result = strdup(total.c_str());
+		}
+		virtual ~ListenException() throw() {
+			delete(_result);
+		}
 		virtual const char* what() const throw() {
-			std::string total = std::string("Listen Exception: ") + _message;
-			const char *result = strdup(total.c_str());
-			return result;
+			return _result;
 		}
 };
 

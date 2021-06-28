@@ -7,13 +7,17 @@
 
 class ConnectionException : public std::exception {
 	private:
-		std::string		_message;
+		char			*_result;
 	public:
-		ConnectionException(char *msg) throw() : std::exception() { _message = msg; }
+		ConnectionException(char *msg) throw() : std::exception() {
+			std::string total = std::string("Connection Exception: ") + msg;
+			_result = strdup(total.c_str());
+		}
+		virtual ~ConnectionException() throw() {
+			delete(_result);
+		}
 		virtual const char* what() const throw() {
-			std::string total = std::string("Connection Exception: ") + _message;
-			const char *result = strdup(total.c_str());
-			return result;
+			return _result;
 		}
 };
 
