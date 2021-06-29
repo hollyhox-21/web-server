@@ -21,5 +21,5 @@ int SocketBase::getSocket() {
 
 void SocketBase::setSocket(int socket) {
 	if ((_socket = socket) < 0)
-		throw SocketException(strerror(errno));
+		throw SocketException("Socket didn't created");
 }

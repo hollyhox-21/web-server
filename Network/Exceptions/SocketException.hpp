@@ -9,7 +9,7 @@ class SocketException : public std::exception {
 	private:
 		char			*_result;
 	public:
-		SocketException(char *msg) throw() : std::exception() {
+		SocketException(const char *msg) throw() : std::exception() {
 			std::string total = std::string("Socket Exception: ") + msg;
 			_result = strdup(total.c_str());
 		}

@@ -30,13 +30,13 @@ void	ServerSocket::connect() {
 
 void	ServerSocket::startListening() {
 	if (listen(getSocket(), SOMAXCONN))
-		throw ListenException(strerror(errno));
+		throw ListenException("Bad socket");
 }
 
 int		ServerSocket::accept() {
 	sockaddr_in address = getAddress();
 	int newSocket = ::accept(getSocket(), (struct sockaddr*)&address, (socklen_t *)&address);
 	if (newSocket < 0)
-		throw SocketException(strerror(errno));
+		throw SocketException("Bad socket");
 	return newSocket;
 }
