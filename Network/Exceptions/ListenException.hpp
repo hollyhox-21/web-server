@@ -9,7 +9,7 @@ class ListenException : public std::exception {
 	private:
 		char			*_result;
 	public:
-		ListenException(char *msg) throw() : std::exception() {
+		ListenException(const char *msg) throw() : std::exception() {
 			std::string total = std::string("Listen Exception: ") + msg;
 			_result = strdup(total.c_str());
 		}

@@ -35,8 +35,8 @@ int		Client::recvMsg() {
 	return nDataLength;
 }
 
-void	Client::sendMsg(std::string const & value) {
-	send(_socket, value.c_str(), value.length(), 0);
+int		Client::sendMsg(std::string const & value) {
+	return send(_socket, value.c_str(), value.length(), 0);
 }
 
 void	Client::changeStage() {

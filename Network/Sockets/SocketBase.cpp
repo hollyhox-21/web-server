@@ -9,7 +9,9 @@ SocketBase::SocketBase(const char *domain, int port) throw() {
 	setSocket( _socket = socket(AF_INET, SOCK_STREAM, 0));
 }
 
-SocketBase::~SocketBase() { }
+SocketBase::~SocketBase() {
+	close(_socket);
+}
 
 struct sockaddr_in SocketBase::getAddress() {
 	return _address;
@@ -21,5 +23,5 @@ int SocketBase::getSocket() {
 
 void SocketBase::setSocket(int socket) {
 	if ((_socket = socket) < 0)
-		throw SocketException(strerror(errno));
+		throw SocketException("Socket didn't created");
 }
