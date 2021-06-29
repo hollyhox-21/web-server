@@ -10,6 +10,7 @@
 #include <iostream>
 
 #define CRLF "\r\n"
+#define CRLF_END "\r\n\r\n"
 
 class Request {
 private:
@@ -24,7 +25,7 @@ private:
     int     _recvRequest(int fd);
     void    _parsRequest(std::string & buffer, int size);
 public:
-	Request(std::string &buffer, int size);
+	Request(std::string &buffer, size_t size);
 	~Request();
 	
 	void    printRequest();

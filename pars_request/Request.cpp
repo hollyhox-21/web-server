@@ -1,6 +1,6 @@
 #include "Request.hpp"
 
-Request::Request(std::string &buffer, int size) {
+Request::Request(std::string &buffer, size_t size) {
 	std::cout << buffer;
 	_parsRequest(buffer, size);
 }
@@ -40,16 +40,19 @@ void Request::_parsRequest(std::string & buffer, int size) {
     if (size == 0) {
         return;
     }
-	std::string firstStr = buffer.substr(0, buffer.find("\r\n"));
-	_method = firstStr.substr(0, _findNth(firstStr, 1, " "));
-	_uri = firstStr.substr(_findNth(firstStr, 1, " ") + 1, _findNth(firstStr, 2, " ") - _findNth(firstStr, 1, " ") - 1);
-	_proto = firstStr.substr(_findNth(firstStr, 2, " ") + 1);
-	buffer.erase(0, buffer.find("\r\n") + 2);
-//	std::cout << buffer << "!!!!" << std::endl;
-	int i = 1;
-	while (_findNth(buffer, i, "\r\n") != string::npos) {
-		std::string key = _findeKey();
-		std::string value = _findValue();
-		_headers.insert(std::pair<std::string, std::string>(key, value));
-	}
+    
+    std::string tmpHeader = buffer.substr(0, buffer.find(CRLF_END));
+//    std::cout << tmpHeader;
+//	std::string firstStr = buffer.substr(0, buffer.find("\r\n"));
+//	_method = firstStr.substr(0, _findNth(firstStr, 1, " "));
+//	_uri = firstStr.substr(_findNth(firstStr, 1, " ") + 1, _findNth(firstStr, 2, " ") - _findNth(firstStr, 1, " ") - 1);
+//	_proto = firstStr.substr(_findNth(firstStr, 2, " ") + 1);
+//	buffer.erase(0, buffer.find("\r\n") + 2);
+//	int i = 1;
+//	while (_findNth(buffer, i, ":") != std::string::npos) {
+//		std::string key = _findeKey();
+//		std::string value = _findValue();
+//		_headers.insert(std::pair<std::string, std::string>(key, value));
+//	}
+//	printRequest();
 }
