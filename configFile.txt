@@ -1,0 +1,47 @@
+server:
+	server_name:ola          
+	host: 127.0.0.1
+	port: 8080
+	error_page: 404     /custom_error/page_404.html
+
+	location: /
+		client_body_buffer_size: 8k or 16k
+		index: index.html
+		allow_methods: GET POST DELETE
+		root: /data/www
+		path_cgi: /bin/cgi
+
+	location: /data
+
+server:
+	location:
+
+	location:
+
+server:
+
+server
+	host: 127.0.0.1
+	port: 8080
+	server_name: localhost
+	error_page:	404error_page.html
+	location: /
+		root:			/Users/flavon/Desktop/webserv/files/
+		index:			index.html
+		allow_methods:	GET
+
+	location: /put_test
+		root:			/Users/flavon/Desktop/webserv/files/
+		allow_methods:	PUT
+
+	location: /post_body
+		root:						/Users/flavon/Desktop/webserv/files/
+		allow_methods:				POST
+		cgi_path:					.bla /Users/flavon/Desktop/webserv/test/cgi_tester
+		limits_client_body_size:	100
+
+	location: /directory
+		root:			/Users/flavon/Desktop/webserv/test/YoupiBanane
+		index:			youpi.bad_extension
+		allow_methods:	GET POST
+		cgi_path:		.bla /Users/flavon/Desktop/webserv/test/cgi_tester

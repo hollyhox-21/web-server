@@ -10,7 +10,6 @@
 #include "../Sockets/ServerSocket.hpp"
 #include "../Models/Location.hpp"
 
-
 class Server : public IEventHandler {
 	private:
 		ServerSocket					*_serverSocket;

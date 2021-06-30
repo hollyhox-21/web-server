@@ -25,7 +25,8 @@ ServerSocket::~ServerSocket() { }
 void	ServerSocket::connect() {
 	sockaddr_in address = getAddress();
 	if (bind(getSocket(), (struct sockaddr*)&address, sizeof(address)))
-		throw ConnectionException(strerror(errno));
+		std::cout << "" << std::endl;
+		// throw ConnectionException(strerror(errno));
 }
 
 void	ServerSocket::startListening() {
@@ -39,4 +40,9 @@ int		ServerSocket::accept() {
 	if (newSocket < 0)
 		throw SocketException("Bad socket");
 	return newSocket;
+}
+
+ServerSocket::ServerSocket(const ServerSocket &s)
+{
+
 }
