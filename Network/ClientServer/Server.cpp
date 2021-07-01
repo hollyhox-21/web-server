@@ -72,14 +72,12 @@ void Server::disconnectEvent(Client & connection, int index) {
 void Server::sendEvent(Client & connection, std::string value) {
 	std::cout << "Msg: " << connection.getSocket() << value << std::endl;
 	int ret = connection.sendMsg("HTTP/1.1 200 OK\nDate: Mon, 27 Jul 2009 12:28:53 GMT\nServer: Apache/2.2.14 (Win32)\nLast-Modified: Wed, 22 Jul 2009 19:15:56 GMT\nContent-Length: 12\nContent-Type: text/html\nClient: Closed\n\nHello world!");
+	connection.changeStage();
 	if (ret == 0) {
 		for (size_t i = 0; i < _clients.size(); i++) {
 			if (_clients[i]->getSocket() == connection.getSocket())
 				disconnectEvent(connection, i);
 		}
-	}
-	else {
-		connection.changeStage();
 	}
 }
 void Server::exceptionEvent(Client & connection, std::exception e) {
