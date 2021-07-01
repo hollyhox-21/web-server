@@ -1,7 +1,7 @@
 server:
 	server_name:ola          
 	host: 127.0.0.1
-	port: 8080
+	port: 8000
 	error_page: 404     /custom_error/page_404.html
 
 	location: /
@@ -14,15 +14,8 @@ server:
 	location: /data
 
 server:
-	location:
-
-	location:
-
-server:
-
-server
 	host: 127.0.0.1
-	port: 8080
+	port: 8321
 	server_name: localhost
 	error_page:	404error_page.html
 	location: /
