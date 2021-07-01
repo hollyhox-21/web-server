@@ -8,7 +8,6 @@ class ServerSocket : public SocketBase {
 	public:
 		ServerSocket() { };
 		ServerSocket(const char *domain, int port) throw();
-		ServerSocket(ServerSocket const &s);
 		virtual ~ServerSocket();
 
 		void	connect();
