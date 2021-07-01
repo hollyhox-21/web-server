@@ -40,7 +40,7 @@ public:
 	std::string	getMethod() const;
 	std::string	getUri() const;
 	std::string getProto() const;
-	std::string	getValueMapHeader(std::string & key);
+	std::string	getValueMapHeader(std::string key);
 	
 	std::string getHeader() const;
 	void	parsRequest(std::string & buffer, int size);
