@@ -6,9 +6,9 @@
 class ServerSocket : public SocketBase {
 	private:
 	public:
+		ServerSocket() { };
 		ServerSocket(const char *domain, int port) throw();
-		ServerSocket(ServerSocket const & s);
-		~ServerSocket();
+		virtual ~ServerSocket();
 
 		void	connect();
 		void	startListening();

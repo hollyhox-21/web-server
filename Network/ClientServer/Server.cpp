@@ -14,6 +14,7 @@ void Server::run () {
 		_fdMax = _serverSocket->getSocket();
 		for (unsigned long i = 0; i < _clients.size(); i++)
 		{
+
 			if (_fdMax < _clients[i]->getSocket())
 				_fdMax = _clients[i]->getSocket();
 			FD_SET(_clients[i]->getSocket(), &_readFds);
