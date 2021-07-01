@@ -9,6 +9,7 @@
 #include "Client.hpp"
 #include "../Sockets/ServerSocket.hpp"
 #include "../Models/Location.hpp"
+#include "../Models/Request.hpp"
 
 class Server : public IEventHandler {
 	private:
