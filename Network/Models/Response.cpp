@@ -18,19 +18,17 @@ Response::Response(Request &request, std::map<int, std::string> &errorPage, std:
 
 void Response::responseOnGet()
 {
-//	std::map<std::string, Location>::iterator it = _locations.begin();/**/
 	for (std::map<std::string, Location>::iterator it = _locations.begin(); it != _locations.end(); ++it)
 	{
 		if (it->first.find(_request.getUri()) != std::string::npos)
 		{
-//			std::vector<std::string> autoindex;
 			std::ifstream file(it->second.root + it->second.index);
 			if (file.fail() && it->second.autoindex.find("on", 0, 2) != std::string::npos)
 			{
 				DIR *dir;
 				struct dirent *ent;
 				if ((dir = opendir(it->second.root.c_str())) != NULL) {
-					std::ifstream file("/Users/ptycho/Documents/42cursus/web-server/autoidex.html");
+					std::ifstream file("../Network/html/autoidex.html");
 					if (file.fail())
 					{
 						nullptr;
@@ -42,7 +40,6 @@ void Response::responseOnGet()
 							break;
 						one_line.insert(one_line.size(), "\r\n");
 						_autoindex->push_back(one_line);
-//						std::cout << one_line;
 					}
 					while ((ent = readdir (dir)) != NULL) {
 						std::string pre = "\t\t\t<li class=\"files\"><a href=\"";
@@ -51,13 +48,11 @@ void Response::responseOnGet()
 						pre += ent->d_name;
 						pre += "</a></li>\r\n";
 						_autoindex->push_back(pre);
-//						std::cout << pre;
 					}
 					while (getline(file, one_line))
 					{
 						one_line.insert(one_line.size(), "\r\n");
 						_autoindex->push_back(one_line);
-//						std::cout << one_line;
 					}
 				}
 				else
@@ -69,9 +64,7 @@ void Response::responseOnGet()
 			{
 
 			}
-//			_autoindex = &autoindex;
-			it = _locations.end();
-			--it;
+			break;
 		}
 	}
 }
