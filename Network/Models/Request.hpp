@@ -22,7 +22,7 @@ private:
     std::string _uri;
     std::string _proto;
 	
-	std::string                         _body;
+	std::string 						_body;
 	std::string							_header;
 	std::map<std::string, std::string>  _mapHeaders;
 	
@@ -39,8 +39,13 @@ public:
 	Request();
 	~Request();
 	
-	std::string	getHeader() const;
-	void		parsRequest(std::string & buffer, int size);
+	std::string	getMethod() const;
+	std::string	getUri() const;
+	std::string getProto() const;
+	std::string	getValueMapHeader(std::string & key);
+	
+	std::string getHeader() const;
+	void	parsRequest(std::string & buffer, int size);
 	
 	void    printRequest();
 	void	printMap();
