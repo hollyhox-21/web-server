@@ -18,7 +18,7 @@ class Client {
 		~Client();
 
 		int				recvMsg();
-		void			sendMsg(std::string const & value);
+		int 			sendMsg(std::string const & value);
 		void			changeStage();
 
 		std::string		getMessage();
