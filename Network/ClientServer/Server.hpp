@@ -33,7 +33,7 @@ class Server : public IEventHandler {
 		void setName(std::string const & name) { _name = name; }
 		void setHost(std::string const & host) { _host = host; }
 		void setPort(int port) { _port = port; }
-		void setErorPages(std::map<int, std::string> errorPages) { _errorPages = errorPages; }
+		void setErrorPages(std::map<int, std::string> errorPages) { _errorPages = errorPages; }
 		void setLocations(std::map<std::string, Location> locations) { _locations = locations; }
 
 		void connectEvent(Client & connection);

@@ -4,6 +4,13 @@
 #include <fstream>
 #include <string>
 #include <algorithm>
+#include <pthread.h>
+
+void *runServer(void *serv) {
+	((Server*)serv)->run();
+	return NULL;
+}
+
 
 std::string pars_one_arg(std::string &line)
 {
@@ -38,7 +45,6 @@ int main(int ac, char **av)
 		return -1;
 	}
 	std::string line;
-	int fser = 0;
 	while (1)
 	{
 		std::vector<std::string> ser;
@@ -58,8 +64,8 @@ int main(int ac, char **av)
 			continue;
 		}
 	}
-	std::vector<Server> serv = std::vector<Server>();
-	for (int i = 0; i < servs.size(); ++i)
+	std::vector<Server*> serv = std::vector<Server*>();
+	for (unsigned long i = 0; i < servs.size(); ++i)
 	{
 		if (i == 3)
 			NULL;
@@ -68,8 +74,8 @@ int main(int ac, char **av)
 		std::map<std::string, Location> location;
 		std::map<int, std::string> erPage;
 		Location loc;
-		Server s = Server();
-		for (int j = 0; j < servs[i].size(); ++j)
+		Server *s = new Server();
+		for (unsigned long j = 0; j < servs[i].size(); ++j)
 		{
 			line = servs[i][j];
 			if (line[0] == ' '){
@@ -81,17 +87,17 @@ int main(int ac, char **av)
 				if (line.find("server_name:") != std::string::npos)
 				{
 					line = pars_one_arg(line);
-					s.setName(line);
+					s->setName(line);
 				}
 				else if (line.find("host:") != std::string::npos)
 				{
 					line = pars_one_arg(line);
-					s.setHost(line);
+					s->setHost(line);
 				}
 				else if (line.find("port:") != std::string::npos)
 				{
 					line = pars_one_arg(line);
-					s.setPort(atoi(line.c_str()));
+					s->setPort(atoi(line.c_str()));
 				}
 				else if (line.find("error_page:") != std::string::npos)
 				{
@@ -110,7 +116,7 @@ int main(int ac, char **av)
 							second.erase(l, second.length());
 					}
 					erPage.insert(std::pair<int, std::string>(atoi(first.c_str()), second));
-					s.setErrorPages(erPage);
+					s->setErrorPages(erPage);
 				}
 				else if (line.find("location:") != std::string::npos)
 				{
@@ -159,40 +165,20 @@ int main(int ac, char **av)
 				lflg = 0;
 				location.insert(std::make_pair(locPath, loc));
 				loc.reset();
-				s.setLocations(location);
+				s->setLocations(location);
 			}
 		}
 		serv.push_back(s);
 	}
-	for (int i = 0; i < serv.size(); ++i)
+	pthread_t s;
+	for (unsigned long i = 0; i < serv.size(); ++i)
 	{
-		std::cout << "server:" << std::endl;
-		std::cout << "\tserver_name: " << serv[i].getName() << std::endl;
-		std::cout << "\thost: " << serv[i].getHost() << std::endl;
-		std::cout << "\tport: " << serv[i].getPort() << std::endl;
-		std::map<int, std::string> ep = serv[i].getErrorPages();
-		std::map<int, std::string>::iterator ite = ep.begin();
-		while (ite != ep.end())
-			std::cout << "\terror_page: " << ite->first << " " << ite++->second << std::endl;
-		std::map<std::string, Location> ms = serv[i].getLocations();
-		std::map<std::string, Location>::iterator itl = ms.begin();
-		while (itl != ms.end())
-		{
-			std::cout << "\tlocation: " << itl->first << std::endl;
-			std::cout << "\t\tindex: " << itl->second.index << std::endl;
-			std::cout << "\t\tpath_cgi: " << itl->second.pathCgi << std::endl;
-			std::cout << "\t\troot: " << itl->second.root << std::endl;
-			std::map<std::string, bool> met = itl->second.methods;
-			std::map<std::string, bool>::iterator itm = met.begin();
-			if (met.size())
-				std::cout << "\t\tallow_methods: ";
-			while (itm != met.end())
-				std::cout << itm++->first << " ";
-			if (met.size())
-				std::cout << std::endl;
-			itl++;
-		}
+		std::cout << i << std::endl;
+		serv[i]->ready();
+		pthread_create(&s, NULL, &runServer, serv[i]);
 	}
 	file.close();
+	while (1)
+	 ;
 	return 0;
 }
