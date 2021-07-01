@@ -9,6 +9,8 @@
 #include <map>
 #include <iostream>
 #include <cstdlib>
+#include <algorithm>
+
 
 #define CRLF "\r\n"
 #define CRLF_END "\r\n\r\n"
@@ -37,8 +39,8 @@ public:
 	Request();
 	~Request();
 	
-	std::string getHeader() const;
-	void	parsRequest(std::string & buffer, int size);
+	std::string	getHeader() const;
+	void		parsRequest(std::string & buffer, int size);
 	
 	void    printRequest();
 	void	printMap();

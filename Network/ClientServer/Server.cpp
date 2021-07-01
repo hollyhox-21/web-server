@@ -54,10 +54,11 @@ void Server::connectEvent(Client & connection) {
 void Server::readEvent(Client & connection) {
 	std::cout << "Reading " << connection.getSocket() << std::endl;
 	int ret = connection.recvMsg();
-	if (ret == -2)
-		std::cout << connection.getMessage();
-	else if (ret == 0)
-	{
+	if (ret == -2) {
+		connection.getRequest().printRequest();
+		connection.getRequest().printMap();
+	}
+	else if (ret == 0) {
 		for (size_t i = 0; i < _clients.size(); i++) {
 			if (_clients[i]->getSocket() == connection.getSocket())
 				disconnectEvent(connection, i);

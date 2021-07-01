@@ -29,7 +29,7 @@ int		Client::recvMsg() {
 			end = false;
 	}
 	if (end == true) {
-		std::cout << std::endl << "Konec file" << std::endl;
+		_req.parsRequest(_message, nDataLength);
 		return -2;
 	}
 	return nDataLength;
