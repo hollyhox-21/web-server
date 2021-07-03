@@ -10,20 +10,17 @@
 #include <iostream>
 #include <cstdlib>
 
-#include <algorithm>
-
 #define CRLF "\r\n"
 #define CRLF_END "\r\n\r\n"
 
 class Request {
 private:
-	int			_result;
+//	int			_result;
     std::string _method;
     std::string _uri;
     std::string _proto;
 	
-
-	std::string                         _body;
+	std::string 						_body;
 	std::string							_header;
 	std::map<std::string, std::string>  _mapHeaders;
 	
@@ -40,14 +37,13 @@ public:
 	Request();
 	~Request();
 	
-
 	std::string	getMethod() const;
 	std::string	getUri() const;
 	std::string getProto() const;
 	std::string	getValueMapHeader(std::string key);
-
+	
 	std::string getHeader() const;
-	void	parsRequest(std::string & buffer, int size);
+	void	parsRequest(std::string & buffer);
 	
 	void    printRequest();
 	void	printMap();

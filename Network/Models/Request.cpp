@@ -1,13 +1,13 @@
 #include "Request.hpp"
 
 Request::Request() :
-	_result(0), _method(""), _uri(""), _proto(""), _body(""), _header("") {
+	_method(""), _uri(""), _proto(""), _body(""), _header("") {
 }
 
 Request::~Request() {}
 
 void print_buffer(std::string & buffer) {
-	for (int i = 0; i < buffer.length(); ++i) {
+	for (size_t i = 0; i < buffer.length(); ++i) {
 		if (buffer[i] == '\n')
 			printf("%s", "\\n");
 		else if (buffer[i] == '\r')
@@ -23,7 +23,7 @@ void Request::printRequest() {
 }
 
 void Request::printMap() {
-	for (auto i = _mapHeaders.begin(); i != _mapHeaders.end(); ++i) {
+	for (std::map<std::string, std::string>::iterator i = _mapHeaders.begin(); i != _mapHeaders.end(); ++i) {
 		std::string key = i->first;
 //		printf("%s\n", _mapHeaders[key].c_str());
 		printf("[%s] = ", key.c_str());
@@ -73,7 +73,7 @@ void Request::_parsHeaders(std::string &buffer) {
 void Request::_parsBody(std::string &buffer) {
 	if (_header.empty())
 		_body = buffer.substr(0);
-	if (_body.length() != atoi(_mapHeaders["Content-Length"].c_str())) {
+	if (_body.length() != size_t(atoi(_mapHeaders["Content-Length"].c_str()))) {
 		_body += buffer.substr(0);
 	}
 }
@@ -107,14 +107,13 @@ size_t Request::_findNth(const std::string & str , unsigned int N, const std::st
 	return pos;
 }
 
-void Request::parsRequest(std::string & buffer, int size) {
+void Request::parsRequest(std::string & buffer) {
 	if (_checkEndHeaders(buffer)) {
 		_header.append(buffer.begin(), buffer.begin() + buffer.find(CRLF_END));
 		_parsHeaders(buffer);
-
 //		if (_checkContentLength())
 //			_parsBody(buffer);
-		// printMap();
+		printMap();
 	}
 	else if (_checkContentLength()) {
 //		_body = reinterpret_cast<unsigned char *>((new (unsigned char))[atoi(_mapHeaders["Content-Length"].c_str())]);
@@ -124,13 +123,11 @@ void Request::parsRequest(std::string & buffer, int size) {
 	
 	}
 //	_result = 1;
-
 	
 }
 
 std::string Request::getHeader() const {
 	return _header;
-
 }
 
 std::string	Request::getMethod() const { return _method; }
