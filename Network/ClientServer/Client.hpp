@@ -2,7 +2,8 @@
 # define CLIENT_HPP
 
 # include "IEventHandler.hpp"
-# include <unistd.h>
+# include <stdio.h>
+# include <cstring>
 # include <sys/types.h>
 # include <sys/socket.h>
 # include "../Models/Request.hpp"
