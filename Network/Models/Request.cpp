@@ -126,3 +126,13 @@ void Request::parsRequest(std::string & buffer, int size) {
 std::string Request::getHeader() const {
 	return _header;
 }
+
+const std::string &Request::getMethod() const
+{
+	return _method;
+}
+
+const std::string &Request::getUri() const
+{
+	return _uri;
+}
