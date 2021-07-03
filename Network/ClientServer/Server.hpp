@@ -1,3 +1,6 @@
+#ifndef SERVER_HPP
+# define SERVER_HPP
+
 #include <stdio.h>
 #include <sys/time.h>
 #include <sys/types.h>
@@ -6,11 +9,11 @@
 #include "Client.hpp"
 #include "../Sockets/ServerSocket.hpp"
 #include "../Models/Location.hpp"
-
+#include "../Models/Request.hpp"
 
 class Server : public IEventHandler {
 	private:
-		ServerSocket					_serverSocket;
+		ServerSocket					*_serverSocket;
 		std::string						_name;
 		std::string						_host;
 		int								_port;
@@ -22,12 +25,16 @@ class Server : public IEventHandler {
 		int								_fdMax;
 
 	public:
-		Server(std::string const & host, int port);
-		Server(std::string const & host, int port, std::map<int, std::string> errorPages, std::map<std::string, Location> locations);
+		Server() { }
+		~Server() { delete( _serverSocket); }
 
+		void ready();
 		void run ();
 
-		void setErorPages(std::map<int, std::string> errorPages) { _errorPages = errorPages; }
+		void setName(std::string const & name) { _name = name; }
+		void setHost(std::string const & host) { _host = host; }
+		void setPort(int port) { _port = port; }
+		void setErrorPages(std::map<int, std::string> errorPages) { _errorPages = errorPages; }
 		void setLocations(std::map<std::string, Location> locations) { _locations = locations; }
 
 		void connectEvent(Client & connection);
@@ -36,3 +43,5 @@ class Server : public IEventHandler {
 		void sendEvent(Client & connection, std::string value);
 		void exceptionEvent(Client & connection, std::exception e);
 };
+
+#endif

@@ -9,6 +9,8 @@
 #include <map>
 #include <iostream>
 #include <cstdlib>
+#include <algorithm>
+
 
 #define CRLF "\r\n"
 #define CRLF_END "\r\n\r\n"

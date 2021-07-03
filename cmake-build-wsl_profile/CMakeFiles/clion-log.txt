@@ -1,0 +1,4 @@
+/usr/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /mnt/c/Users/79199/projects/untitled
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /mnt/c/Users/79199/projects/untitled/cmake-build-wsl_profile

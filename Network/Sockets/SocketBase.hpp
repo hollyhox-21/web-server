@@ -1,6 +1,7 @@
 #ifndef SOCKETBASE_HPP
 # define SOCKETBASE_HPP
 
+# include <unistd.h>
 #include <iostream>
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -18,6 +19,7 @@ class SocketBase {
 
 		void				setSocket(int socket);
 	public:
+		SocketBase() {}
 		SocketBase(const char *domain, int port) throw();
 		SocketBase(SocketBase const & s);
 		virtual ~SocketBase();

@@ -9,7 +9,7 @@ class ConnectionException : public std::exception {
 	private:
 		char			*_result;
 	public:
-		ConnectionException(char *msg) throw() : std::exception() {
+		ConnectionException(const char *msg) throw() : std::exception() {
 			std::string total = std::string("Connection Exception: ") + msg;
 			_result = strdup(total.c_str());
 		}
