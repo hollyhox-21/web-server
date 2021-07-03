@@ -6,9 +6,10 @@ server:
 
 	location: /
 		client_body_buffer_size: 8k or 16k
+		autoindex: on
 		index: index.html
 		allow_methods: GET POST DELETE
-		root: /data/www
+		root: /Users/ptycho/Documents/42cursus/web-server
 		path_cgi: /bin/cgi
 
 	location: /data
@@ -17,7 +18,7 @@ server:
 	host: 127.0.0.1
 	port: 8321
 	server_name: localhost
-	error_page:	404error_page.html
+	error_page:	404 error_page.html
 	location: /
 		root:			/Users/flavon/Desktop/webserv/files/
 		index:			index.html

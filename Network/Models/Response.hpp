@@ -12,6 +12,9 @@
 #include <cstring>
 #include <dirent.h>
 #include <vector>
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 
 class Response
@@ -21,6 +24,8 @@ private:
 	int				_statusCode;
 	char			*_time;
 	std::string		_name;
+	int _fileLength;
+	char *_fileSrc;
 	std::vector<std::string> *_autoindex;
 	Request &_request;
 	std::map<int, std::string> &_errorPage;
@@ -32,7 +37,7 @@ private:
 public:
 	Response(Request &request, std::map<int, std::string> &errorPage, std::map<std::string, Location> &locations);
 	~Response();
-	char *toFront();
+	std::pair<char *, int> toFront();
 };
 
 
