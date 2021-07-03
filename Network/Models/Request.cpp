@@ -1,7 +1,7 @@
 #include "Request.hpp"
 
 Request::Request() :
-	_result(0), _method(""), _uri(""), _proto(""), _body(nullptr), _header("") {
+	_result(0), _method(""), _uri(""), _proto(""), _body(""), _header("") {
 }
 
 Request::~Request() {}
@@ -113,7 +113,7 @@ void Request::parsRequest(std::string & buffer, int size) {
 		_parsHeaders(buffer);
 //		if (_checkContentLength())
 //			_parsBody(buffer);
-		printMap();
+		// printMap();
 	}
 	else if (_checkContentLength()) {
 //		_body = reinterpret_cast<unsigned char *>((new (unsigned char))[atoi(_mapHeaders["Content-Length"].c_str())]);
