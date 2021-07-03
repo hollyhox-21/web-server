@@ -2,9 +2,11 @@
 # define CLIENT_HPP
 
 # include "IEventHandler.hpp"
-# include <unistd.h>
+# include <stdio.h>
+# include <cstring>
 # include <sys/types.h>
 # include <sys/socket.h>
+# include "../Models/Request.hpp"
 
 # define BUFFER_SIZE 256
 
@@ -13,6 +15,7 @@ class Client {
 		int				_socket;
 		bool			_read;
 		std::string		_message;
+		Request			_req;
 	public:
 		Client(int socket);
 		~Client();
@@ -24,6 +27,7 @@ class Client {
 		std::string		getMessage();
 		int				getSocket();
 		bool			getStage();
+		Request&		getRequest() { return _req; }
 };
 
 #endif
