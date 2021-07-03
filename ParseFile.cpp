@@ -173,8 +173,11 @@ int main(int ac, char **av)
 	pthread_t s;
 	for (unsigned long i = 0; i < serv.size(); ++i)
 	{
-		std::cout << i << std::endl;
-		serv[i]->ready();
+		try {
+			serv[i]->ready();
+		} catch (std::exception &e) {
+			std::cout << "Failed create " << i << " server" << std::endl;
+		}
 		pthread_create(&s, NULL, &runServer, serv[i]);
 	}
 	file.close();

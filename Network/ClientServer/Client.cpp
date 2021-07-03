@@ -25,11 +25,13 @@ int		Client::recvMsg() {
 		_message = _message.substr(0, konec + 4 - _message.c_str());
 		std::cout << _message << std::endl;
 		_req.parsRequest(_message, nDataLength);
-		int		contentLenght = atoi(_req.getValueMapHeader(std::string("Content-Length")).c_str());
-		char bufferBody[contentLenght];
-		nDataLength = recv(getSocket(), bufferBody, contentLenght, 0);
-		body.append(bufferBody, nDataLength);
-		std::cout << "Body: " << body <<  " " << nDataLength << " " << contentLenght << std::endl;
+		if (_req.getMethod() != "GET") {
+			int		contentLenght = atoi(_req.getValueMapHeader(std::string("Content-Length")).c_str());
+			char bufferBody[contentLenght];
+			nDataLength = recv(getSocket(), bufferBody, contentLenght, 0);
+			body.append(bufferBody, nDataLength);
+			std::cout << "Body: " << body <<  " " << nDataLength << " " << contentLenght << std::endl;
+		}
 		return -2;
 	}
 	return nDataLength;

@@ -5,7 +5,7 @@ void Server::ready () {
 }
 
 void Server::run () {
-	std::cout << "Starting..." << std::endl;
+	std::cout << "Starting..." << _serverSocket->getSocket() << std::endl;
 	while (true)
 	{
 		FD_ZERO(&_readFds);
@@ -39,9 +39,14 @@ void Server::run () {
 		}
 		if (FD_ISSET(_serverSocket->getSocket(), &_readFds))
 		{
-			Client *client = new Client(_serverSocket->accept());
-			_clients.push_back(client);
-			connectEvent(*client);
+			try {
+				Client *client = new Client(_serverSocket->accept());
+				_clients.push_back(client);
+				connectEvent(*client);
+			} catch(std::exception &e) {
+				perror("accept");
+				std::cout << e.what() << std::endl;
+			}
 		}
 	}
 }
