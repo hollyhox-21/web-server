@@ -15,7 +15,7 @@
 
 class Request {
 private:
-	int			_result;
+//	int			_result;
     std::string _method;
     std::string _uri;
     std::string _proto;
@@ -43,7 +43,7 @@ public:
 	std::string	getValueMapHeader(std::string key);
 	
 	std::string getHeader() const;
-	void	parsRequest(std::string & buffer, int size);
+	void	parsRequest(std::string & buffer);
 	
 	void    printRequest();
 	void	printMap();
