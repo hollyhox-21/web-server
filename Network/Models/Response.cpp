@@ -66,6 +66,7 @@ void Response::responseOnGet()
 					{
 						DIR *dir;
 						struct dirent *ent;
+						std::string src;
 						if ((dir = opendir(uri.c_str())) != NULL)
 						{
 							std::ifstream file("../Network/html/autoindex.html");
@@ -79,8 +80,8 @@ void Response::responseOnGet()
 								if (one_line.find("<$ListOfFiles>") !=
 									std::string::npos)
 									break;
-								one_line.insert(one_line.size(), "\r\n");
-								_autoindex->push_back(one_line);
+								one_line += "\n";
+								src += one_line;
 							}
 							while ((ent = readdir(dir)) != NULL)
 							{
@@ -88,13 +89,19 @@ void Response::responseOnGet()
 								pre += it->first;
 								pre += "\">";
 								pre += ent->d_name;
-								pre += "</a></li>\r\n";
-								_autoindex->push_back(pre);
+								pre += "</a></li>\n";
+								src += pre;
 							}
 							while (getline(file, one_line))
 							{
-								one_line.insert(one_line.size(), "\r\n");
-								_autoindex->push_back(one_line);
+								one_line += "\n";
+								src += one_line;
+							}
+							_fileLength = src.length();
+							_fileSrc = new char[_fileLength];
+							for (int i = 0; i < _fileLength; ++i)
+							{
+								_fileSrc[i] = src[i];
 							}
 						}
 					}

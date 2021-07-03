@@ -24,7 +24,7 @@ private:
 	int				_statusCode;
 	char			*_time;
 	std::string		_name;
-	int _fileLength;
+	unsigned long _fileLength;
 	char *_fileSrc;
 	std::vector<std::string> *_autoindex;
 	Request &_request;
