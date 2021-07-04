@@ -32,7 +32,7 @@ private:
 	void responseOnGet();
 	void responseOnPost();
 	void responseOnDelete();
-	void fileNotFound();
+	void fileNotFound(std::string root);
 public:
 	Response(Request &request, std::map<int, std::string> &errorPage, std::map<std::string, Location> &locations);
 	~Response();
