@@ -24,7 +24,7 @@ int		Client::recvMsg() {
 		std::string body = std::string(konec + 4);
 		_message = _message.substr(0, konec + 4 - _message.c_str());
 		std::cout << _message << std::endl;
-		_req.parsRequest(_message, nDataLength);
+		_req.parsRequest(_message);
 		if (_req.getMethod() != "GET") {
 			int		contentLenght = atoi(_req.getValueMapHeader(std::string("Content-Length")).c_str());
 			char bufferBody[contentLenght];
@@ -37,8 +37,10 @@ int		Client::recvMsg() {
 	return nDataLength;
 }
 
-int		Client::sendMsg(std::string const & value) {
-	return send(_socket, value.c_str(), value.length(), 0);
+int		Client::sendMsg() {
+	int result = send(_socket, _res->toFront().first, _res->toFront().second, 0);
+	delete(_res);
+	return result;
 }
 
 void	Client::changeStage() {
@@ -57,4 +59,8 @@ bool	Client::getStage() {
 	return _read;
 }
 
-
+void	Client::setResponse(std::map<int, std::string> & errPage, std::map<std::string, Location> & locations) {
+	_res = new Response(_req, errPage, locations);
+	std::cout << "\n\nResponse\n";
+	std::cout << _res->toFront().first << std::endl;
+}

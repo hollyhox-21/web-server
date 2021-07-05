@@ -307,7 +307,7 @@ void Response::fileNotFound(std::string root)
 		path = "../Network/html/404.html";
 	std::ifstream file(path);
 	if (file.fail())
-		nullptr;
+		return;
 	else
 	{
 		std::string line, src;
