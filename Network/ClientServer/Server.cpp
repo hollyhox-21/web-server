@@ -34,7 +34,7 @@ void Server::run () {
 			if (FD_ISSET(_clients[i]->getSocket(), &_readFds)) {
 				readEvent(*_clients[i]);
 			} else if (FD_ISSET(_clients[i]->getSocket(), &_writeFds)) {
-				sendEvent(*_clients[i], "");
+				sendEvent(*_clients[i]);
 			}
 		}
 		if (FD_ISSET(_serverSocket->getSocket(), &_readFds))
@@ -74,9 +74,10 @@ void Server::disconnectEvent(Client & connection, int index) {
 	delete(_clients[index]);
 	_clients.erase(_clients.begin() + index);
 }
-void Server::sendEvent(Client & connection, std::string value) {
-	std::cout << "Msg: " << connection.getSocket() << value << std::endl;
-	int ret = connection.sendMsg("HTTP/1.1 200 OK\nDate: Mon, 27 Jul 2009 12:28:53 GMT\nServer: Apache/2.2.14 (Win32)\nLast-Modified: Wed, 22 Jul 2009 19:15:56 GMT\nContent-Length: 12\nContent-Type: text/html\nClient: Closed\n\nHello world!");
+void Server::sendEvent(Client & connection) {
+	std::cout << "Msg: " << connection.getSocket() << std::endl;
+	connection.setResponse(_errorPages, _locations);
+	int ret = connection.sendMsg();
 	connection.changeStage();
 	if (ret == 0) {
 		for (size_t i = 0; i < _clients.size(); i++) {
