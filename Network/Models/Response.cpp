@@ -2,6 +2,7 @@
 #include "Response.hpp"
 #include <fcntl.h>
 
+
 Response::~Response()
 {
 	delete[] _fileSrc;
@@ -15,6 +16,73 @@ Response::Response(Request &request, std::map<int, std::string> &errorPage, std:
 		responseOnPost();
 	else if (request.getMethod().find("DELETE", 0, 6) != std::string::npos)
 		responseOnDelete();
+}
+
+char month[12][4] = {"Jan",
+					 "Feb",
+					 "Mar",
+					 "Apr",
+					 "May",
+					 "Jun",
+					 "Jul",
+					 "Aug",
+					 "Sep",
+					 "Oct",
+					 "Nov",
+					 "Dec"};
+
+char week[7][4] = {
+		"Mod",
+		"Tue",
+		"Wed",
+		"Thu",
+		"Fri",
+		"Sat",
+		"Sun"
+};
+
+std::string Response::getdate()
+{
+	std::time_t t = std::time(0);
+	std::tm *now = std::localtime(&t);
+	std::string date;
+	date += week[now->tm_wday];
+	date += ",";
+	date += now->tm_mday;
+	date += ' ';
+	date += month[now->tm_mon];
+	date += ' ';
+	date += std::to_string(now->tm_year + 1900);
+	date += ' ';
+	date += std::to_string(now->tm_hour);
+	date += ':';
+	date += std::to_string(now->tm_min);
+	date += ':';
+	date += std::to_string(now->tm_sec);
+	date += " GMT\r\n";
+	return date;
+}
+
+std::string Response::makeHeader(std::string &uri, std::string &src)
+{
+	std::string header;
+	header += "HTTP/1.1 200 OK\r\n";
+	header += "Date: ";
+	header += getdate();
+	header += "Server: WebServer By Monsters\r\n";
+	header += "Last-Modified: ";
+	header += getdate();
+//			  "Wed, 22 Jul 2009 19:15:56 GMT\r\n";
+	header += "Content-Length: ";
+	header += std::to_string(_fileLength);
+	header += "\r\n";
+	if (uri.rfind(".html") != std::string::npos)
+		header += "Content-Type: text/html'\r\n";
+	else
+		header += "Content-Type: image/png'\r\n";
+	header += "Client: Closed\r\n\r\n";
+	header += src;
+	return header;
 }
 
 void Response::responseOnGet()
@@ -60,6 +128,7 @@ void Response::responseOnGet()
 							std::string dst(buff, len);
 							src += dst;
 						}
+						src = makeHeader(uri, src);
 						_fileSrc = new char[_fileLength];
 						for (unsigned long i = 0; i < _fileLength; ++i)
 							_fileSrc[i] = src[i];
@@ -74,7 +143,8 @@ void Response::responseOnGet()
 						std::string src;
 						if ((dir = opendir(uri.c_str())) != NULL)
 						{
-							std::ifstream file("../Network/html/autoindex.html");
+							std::string path = "../Network/html/autoindex.html";
+							std::ifstream file(path);
 							if (file.fail())
 							{
 								fileNotFound(it->second.root);
@@ -104,6 +174,7 @@ void Response::responseOnGet()
 								src += one_line;
 							}
 							_fileLength = src.length();
+							src = makeHeader(path, src);
 							_fileSrc = new char[_fileLength];
 							for (unsigned long i = 0; i < _fileLength; ++i)
 							{
