@@ -61,4 +61,6 @@ bool	Client::getStage() {
 
 void	Client::setResponse(std::map<int, std::string> & errPage, std::map<std::string, Location> & locations) {
 	_res = new Response(_req, errPage, locations);
+	std::cout << "\n\nResponse\n";
+	std::cout << _res->toFront().first << std::endl;
 }

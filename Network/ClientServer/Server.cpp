@@ -34,7 +34,7 @@ void Server::run () {
 			if (FD_ISSET(_clients[i]->getSocket(), &_readFds)) {
 				readEvent(*_clients[i]);
 			} else if (FD_ISSET(_clients[i]->getSocket(), &_writeFds)) {
-				sendEvent(*_clients[i], "");
+				sendEvent(*_clients[i]);
 			}
 		}
 		if (FD_ISSET(_serverSocket->getSocket(), &_readFds))
