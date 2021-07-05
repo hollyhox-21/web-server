@@ -186,6 +186,22 @@ std::vector<Server*> parser(std::string path)
 	return serv;
 }
 
+int main(int ac, char **av)
+{
+	(void)ac;
+	std::vector<Server*> serv;
+	serv = parser(av[1]);
+	pthread_t s;
+	for (unsigned long i = 0; i < serv.size(); ++i)
+	{
+		std::cout << i << std::endl;
+		serv[i]->ready();
+		pthread_create(&s, NULL, &runServer, serv[i]);
+	}
+	while (1)
+		;
+}
+
 //int main(int ac, char **av)
 //{
 //	std::vector<std::vector<std::string> > servs;

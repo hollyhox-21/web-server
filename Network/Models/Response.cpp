@@ -77,10 +77,10 @@ std::string Response::makeHeader(std::string &uri, std::string &src)
 	header += std::to_string(_fileLength);
 	header += "\r\n";
 	if (uri.rfind(".html") != std::string::npos)
-		header += "Content-Type: text/html'\r\n";
+		header += "Content-Type: text/html\r\n";
 	else
-		header += "Content-Type: image/png'\r\n";
-	header += "Client: Closed\r\n\r\n";
+		header += "Content-Type: image/jpeg\r\n";
+	header += "Client: Keep-Alive\r\n\r\n";
 	header += src;
 	return header;
 }
@@ -129,6 +129,8 @@ void Response::responseOnGet()
 							src += dst;
 						}
 						src = makeHeader(uri, src);
+						_fileLength += src.find("\r\n\r\n");
+						_fileLength += 4;
 						_fileSrc = new char[_fileLength];
 						for (unsigned long i = 0; i < _fileLength; ++i)
 							_fileSrc[i] = src[i];
@@ -175,6 +177,8 @@ void Response::responseOnGet()
 							}
 							_fileLength = src.length();
 							src = makeHeader(path, src);
+							_fileLength += src.find("\r\n\r\n");
+							_fileLength += 5;
 							_fileSrc = new char[_fileLength];
 							for (unsigned long i = 0; i < _fileLength; ++i)
 							{
@@ -307,7 +311,7 @@ void Response::fileNotFound(std::string root)
 		path = "../Network/html/404.html";
 	std::ifstream file(path);
 	if (file.fail())
-		nullptr;
+		return;
 	else
 	{
 		std::string line, src;
