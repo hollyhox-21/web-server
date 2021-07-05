@@ -178,7 +178,7 @@ void Response::responseOnGet()
 							_fileLength = src.length();
 							src = makeHeader(path, src);
 							_fileLength += src.find("\r\n\r\n");
-							_fileLength += 5;
+							_fileLength += 4;
 							_fileSrc = new char[_fileLength];
 							for (unsigned long i = 0; i < _fileLength; ++i)
 							{
