@@ -111,8 +111,8 @@ void Request::parsRequest(std::string & buffer) {
 	if (_checkEndHeaders(buffer)) {
 		_header.append(buffer.begin(), buffer.begin() + buffer.find(CRLF_END));
 		_parsHeaders(buffer);
-//		if (_checkContentLength())
-//			_parsBody(buffer);
+		if (_checkContentLength())
+			_parsBody(buffer);
 		printMap();
 	}
 	else if (_checkContentLength()) {
@@ -133,6 +133,7 @@ std::string Request::getHeader() const {
 std::string	Request::getMethod() const { return _method; }
 std::string Request::getUri() const { return _uri; }
 std::string Request::getProto() const { return _proto; }
+std::string Request::getBody() const { return _body; }
 std::string Request::getValueMapHeader(std::string key) {
 	if ( _mapHeaders.find("Content-Length") == _mapHeaders.end() )
 		return "";

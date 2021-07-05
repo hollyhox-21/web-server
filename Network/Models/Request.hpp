@@ -41,6 +41,7 @@ public:
 	std::string	getUri() const;
 	std::string getProto() const;
 	std::string	getValueMapHeader(std::string key);
+	std::string	getBody() const;
 	
 	std::string getHeader() const;
 	void	parsRequest(std::string & buffer);
