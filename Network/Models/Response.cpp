@@ -191,7 +191,7 @@ void Response::responseOnPost()
 							_fileLength += contLength;
 						}
 						_fileSrc = new char[_fileLength];
-						for (unsigned int i = 0; i < _fileLength; ++i)
+						for (unsigned long i = 0; i < _fileLength; ++i)
 							_fileSrc[i] = src[i];
 						write(fd, _fileSrc + (_fileLength - contLength), contLength);
 					}
