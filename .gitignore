@@ -10,5 +10,5 @@ webserv
 .idea/
 CMakeLists.txt
 cmake-build-debug
-main-2.cpp
+main-.cpp
 Network/Models/pars_request/test.txt
