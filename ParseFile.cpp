@@ -65,7 +65,7 @@ std::vector<Server*> parser(std::string path)
 				continue;
 			}
 		}
-		for (int i = 0; i < servs.size(); ++i)
+		for (unsigned long i = 0; i < servs.size(); ++i)
 		{
 			if (i == 3)
 				NULL;
@@ -75,7 +75,7 @@ std::vector<Server*> parser(std::string path)
 			std::map<int, std::string> erPage;
 			Location loc;
 			Server *s = new Server();
-			for (int j = 0; j < servs[i].size(); ++j)
+			for (unsigned long j = 0; j < servs[i].size(); ++j)
 			{
 				line = servs[i][j];
 				if (line[0] == ' ')

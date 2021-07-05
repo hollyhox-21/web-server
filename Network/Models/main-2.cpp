@@ -10,7 +10,8 @@
 
 
 int main(int ac, char **av) {
-	std::string buffer1 = "GET /Network/html/autoindex.html HTTP/1.1\r\n"
+	(void)ac;
+	std::string buffer1 = "GET /Network/html/toindex.html HTTP/1.1\r\n"
 						 "scheme: https\r\n"
 						 "accept: */*\r\n"
 						 "accept-encoding: gzip, deflate, br\r\n"
@@ -20,13 +21,15 @@ int main(int ac, char **av) {
 						 "sec-ch-ua-mobile: ?0\r\n"
 						 "sec-fetch-dest: script\r\n"
 						 "sec-fetch-mode: no-cors\r\n"
-						 "Content-Length: 12\r\n"
+						 "Content-Length: 38\r\n"
 						 "sec-fetch-site: cross-site\r\n"
 						 "\r\n"
+						 "Hello World!\n"
+						 "Hello World!\n"
 						 "Hello World!";
 	
 	Request myReq;
-	myReq.parsRequest(buffer1, strlen(buffer1.c_str()));
+	myReq.parsRequest(buffer1);
 	std::vector<Server*> serv = parser(av[1]);
 
 //	std::string buffer2 = " worl";
@@ -39,7 +42,7 @@ int main(int ac, char **av) {
 	std::map<int, std::string> errorPage = serv[0]->getErrorPages();
 	std::map<std::string, Location> locations = serv[0]->getLocations();
 	Response response(myReq, errorPage, locations);
-	std::cout << response.toFront().first << std::endl;
+	write(1, response.toFront().first, response.toFront().second);
 //	myReq.printRequest();
 //	printf("%s", myReq.getHeader().c_str());
 	return 0;
