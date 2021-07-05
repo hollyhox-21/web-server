@@ -29,7 +29,10 @@ class Server : public IEventHandler {
 		~Server() { delete( _serverSocket); }
 
 		void ready();
-		void run ();
+
+	const std::map<int, std::string> &getErrorPages() const;
+
+	void run ();
 
 		void setName(std::string const & name) { _name = name; }
 		void setHost(std::string const & host) { _host = host; }
@@ -42,6 +45,8 @@ class Server : public IEventHandler {
 		void readEvent(Client & connection);
 		void sendEvent(Client & connection, std::string value);
 		void exceptionEvent(Client & connection, std::exception e);
+
+	const std::map<std::string, Location> &getLocations() const;
 };
 
 #endif

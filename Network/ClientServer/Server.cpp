@@ -89,3 +89,13 @@ void Server::exceptionEvent(Client & connection, std::exception e) {
 	connection.getSocket();
 	std::cout << "Error: " << e.what() << std::endl;
 }
+
+const std::map<int, std::string> &Server::getErrorPages() const
+{
+	return _errorPages;
+}
+
+const std::map<std::string, Location> &Server::getLocations() const
+{
+	return _locations;
+}
