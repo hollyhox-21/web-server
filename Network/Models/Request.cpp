@@ -113,17 +113,19 @@ void Request::parsRequest(std::string & buffer) {
 		_parsHeaders(buffer);
 		if (_checkContentLength())
 			_parsBody(buffer);
+
 		printMap();
 	}
 	else if (_checkContentLength()) {
 //		_body = reinterpret_cast<unsigned char *>((new (unsigned char))[atoi(_mapHeaders["Content-Length"].c_str())]);
 		_parsBody(buffer);
+
 	}
+	else if (_checkContentLength())
+			_parsBody(buffer);
 	else {
 	
 	}
-//	_result = 1;
-	
 }
 
 std::string Request::getHeader() const {
@@ -140,3 +142,4 @@ std::string Request::getValueMapHeader(std::string key) {
 	else
 		return _mapHeaders[key];
 }
+
