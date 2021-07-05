@@ -5,7 +5,7 @@ void Server::ready () {
 }
 
 void Server::run () {
-	std::cout << "Starting..." << std::endl;
+	std::cout << "Starting..." << _serverSocket->getSocket() << std::endl;
 	while (true)
 	{
 		FD_ZERO(&_readFds);
@@ -22,7 +22,6 @@ void Server::run () {
 				std::cout << "Stage reading..." << _clients[i]->getSocket() << std::endl;
 			} else {
 				std::cout << "Stage writing..." << _clients[i]->getSocket() << std::endl;
-				_clients[i]->changeStage();
 				FD_SET(_clients[i]->getSocket(), &_writeFds);
 			}
 		}
@@ -34,16 +33,20 @@ void Server::run () {
 		for (unsigned long i = 0; i < _clients.size(); i++) {
 			if (FD_ISSET(_clients[i]->getSocket(), &_readFds)) {
 				readEvent(*_clients[i]);
-				_clients[i]->changeStage();
 			} else if (FD_ISSET(_clients[i]->getSocket(), &_writeFds)) {
 				sendEvent(*_clients[i], "");
 			}
 		}
 		if (FD_ISSET(_serverSocket->getSocket(), &_readFds))
 		{
-			Client *client = new Client(_serverSocket->accept());
-			_clients.push_back(client);
-			connectEvent(*client);
+			try {
+				Client *client = new Client(_serverSocket->accept());
+				_clients.push_back(client);
+				connectEvent(*client);
+			} catch(std::exception &e) {
+				perror("accept");
+				std::cout << e.what() << std::endl;
+			}
 		}
 	}
 }
@@ -54,10 +57,12 @@ void Server::connectEvent(Client & connection) {
 void Server::readEvent(Client & connection) {
 	std::cout << "Reading " << connection.getSocket() << std::endl;
 	int ret = connection.recvMsg();
-	if (ret == -2)
-		std::cout << connection.getMessage();
-	else if (ret == 0)
-	{
+	if (ret == -2) {
+		connection.getRequest().printRequest();
+		connection.getRequest().printMap();
+		connection.changeStage();
+	}
+	else if (ret == 0) {
 		for (size_t i = 0; i < _clients.size(); i++) {
 			if (_clients[i]->getSocket() == connection.getSocket())
 				disconnectEvent(connection, i);
@@ -72,8 +77,8 @@ void Server::disconnectEvent(Client & connection, int index) {
 void Server::sendEvent(Client & connection, std::string value) {
 	std::cout << "Msg: " << connection.getSocket() << value << std::endl;
 	int ret = connection.sendMsg("HTTP/1.1 200 OK\nDate: Mon, 27 Jul 2009 12:28:53 GMT\nServer: Apache/2.2.14 (Win32)\nLast-Modified: Wed, 22 Jul 2009 19:15:56 GMT\nContent-Length: 12\nContent-Type: text/html\nClient: Closed\n\nHello world!");
-	if (ret == 0)
-	{
+	connection.changeStage();
+	if (ret == 0) {
 		for (size_t i = 0; i < _clients.size(); i++) {
 			if (_clients[i]->getSocket() == connection.getSocket())
 				disconnectEvent(connection, i);
