@@ -44,7 +44,7 @@ public:
 	std::string	getBody() const;
 	
 	std::string getHeader() const;
-	void	parsRequest(std::string & buffer);
+	void	parsRequest(std::string & buffer );
 	
 	void    printRequest();
 	void	printMap();
