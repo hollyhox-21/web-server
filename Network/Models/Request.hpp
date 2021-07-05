@@ -15,11 +15,12 @@
 
 class Request {
 private:
-	int			_result;
+//	int			_result;
     std::string _method;
     std::string _uri;
     std::string _proto;
 	
+
 	std::string                         _body;
 	std::string							_header;
 	std::map<std::string, std::string>  _mapHeaders;
