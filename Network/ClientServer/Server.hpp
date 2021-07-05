@@ -43,7 +43,7 @@ class Server : public IEventHandler {
 		void connectEvent(Client & connection);
 		void disconnectEvent(Client & connection, int index);
 		void readEvent(Client & connection);
-		void sendEvent(Client & connection, std::string value);
+		void sendEvent(Client & connection);
 		void exceptionEvent(Client & connection, std::exception e);
 
 	const std::map<std::string, Location> &getLocations() const;
