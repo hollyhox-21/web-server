@@ -20,10 +20,10 @@
 class Response
 {
 private:
-	std::string		_version;
-	int				_statusCode;
-	char			*_time;
-	std::string		_name;
+//	std::string		_version;
+//	int				_statusCode;
+//	char			*_time;
+//	std::string		_name;
 	unsigned long _fileLength;
 	char *_fileSrc;
 	Request &_request;

@@ -4,9 +4,10 @@
 
 Response::~Response()
 {
+	delete[] _fileSrc;
 }
 
-Response::Response(Request &request, std::map<int, std::string> &errorPage, std::map<std::string, Location> &locations) : _request(request), _errorPage(errorPage), _locations(locations), _fileLength(0), _fileSrc(NULL)
+Response::Response(Request &request, std::map<int, std::string> &errorPage, std::map<std::string, Location> &locations) : _fileLength(0), _fileSrc(NULL), _request(request), _errorPage(errorPage), _locations(locations)
 {
 	if (request.getMethod().find("GET", 0, 3) != std::string::npos)
 		responseOnGet();
@@ -60,7 +61,7 @@ void Response::responseOnGet()
 							src += dst;
 						}
 						_fileSrc = new char[_fileLength];
-						for (int i = 0; i < _fileLength; ++i)
+						for (unsigned long i = 0; i < _fileLength; ++i)
 							_fileSrc[i] = src[i];
 					}
 				}
@@ -104,7 +105,7 @@ void Response::responseOnGet()
 							}
 							_fileLength = src.length();
 							_fileSrc = new char[_fileLength];
-							for (int i = 0; i < _fileLength; ++i)
+							for (unsigned long i = 0; i < _fileLength; ++i)
 							{
 								_fileSrc[i] = src[i];
 							}
@@ -154,10 +155,10 @@ void Response::responseOnPost()
 						_fileLength = atoi(_request.getValueMapHeader(
 								"Content-Length").c_str());
 						_fileSrc = new char[_fileLength];
-						for (int i = 0; i < _fileLength; ++i)
+						for (unsigned long i = 0; i < _fileLength; ++i)
 							_fileSrc[i] = body[i];
-						break;
 						file.close();
+						break;
 					}
 				}
 				if (buf.st_mode & S_IFREG)
@@ -190,7 +191,7 @@ void Response::responseOnPost()
 							_fileLength += contLength;
 						}
 						_fileSrc = new char[_fileLength];
-						for (int i = 0; i < _fileLength; ++i)
+						for (unsigned long i = 0; i < _fileLength; ++i)
 							_fileSrc[i] = src[i];
 						write(fd, _fileSrc + (_fileLength - contLength), contLength);
 					}
@@ -246,7 +247,7 @@ void Response::fileNotFound(std::string root)
 		}
 		_fileLength = src.length();
 		_fileSrc = new char[_fileLength];
-		for (int i = 0; i < _fileLength; ++i)
+		for (unsigned long i = 0; i < _fileLength; ++i)
 			_fileSrc[i] = src[i];
 	}
 }
