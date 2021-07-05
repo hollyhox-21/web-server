@@ -34,8 +34,7 @@ void	ServerSocket::startListening() {
 
 int		ServerSocket::accept() {
 	sockaddr_in address = getAddress();
-	socklen_t len = sizeof (address);
-	int newSocket = ::accept(getSocket(), (struct sockaddr*)&address, &len);
+	int newSocket = ::accept(getSocket(), (struct sockaddr*)&address, (socklen_t *)&address);
 	if (newSocket < 0)
 		throw ConnectionException("Bad socket");
 	return newSocket;

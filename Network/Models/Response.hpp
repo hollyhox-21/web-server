@@ -24,16 +24,15 @@ private:
 	int				_statusCode;
 	char			*_time;
 	std::string		_name;
-	int _fileLength;
+	unsigned long _fileLength;
 	char *_fileSrc;
-	std::vector<std::string> *_autoindex;
 	Request &_request;
 	std::map<int, std::string> &_errorPage;
 	std::map<std::string, Location> &_locations;
 	void responseOnGet();
 	void responseOnPost();
 	void responseOnDelete();
-	void reple(char *source, char *dest);
+	void fileNotFound(std::string root);
 public:
 	Response(Request &request, std::map<int, std::string> &errorPage, std::map<std::string, Location> &locations);
 	~Response();

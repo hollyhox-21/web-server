@@ -10,11 +10,14 @@ struct Location
 	std::string					root;
 	std::string					pathCgi;
 	std::string					index;
+	std::string					autoindex;
 	void reset(){
 		methods = std::map<std::string, bool>();
 		root = std::string();
 		pathCgi = std::string();
-		index = std::string();}
+		index = std::string();
+		autoindex = std::string();
+	}
 };
 
 #endif
