@@ -72,7 +72,6 @@ std::string Response::makeHeader(std::string &uri, std::string &src)
 	header += "Server: WebServer By Monsters\r\n";
 	header += "Last-Modified: ";
 	header += getdate();
-//			  "Wed, 22 Jul 2009 19:15:56 GMT\r\n";
 	header += "Content-Length: ";
 	header += std::to_string(_fileLength);
 	header += "\r\n";
@@ -120,10 +119,8 @@ void Response::responseOnGet()
 						char buff[1025];
 						std::string src;
 						int len;
-//						char dst[3000000];
 						while ((len = read(fd, buff, 1024)) > 0)
 						{
-//							(char*)memmove(dst + _fileLength, buff, len);
 							_fileLength += len;
 							std::string dst(buff, len);
 							src += dst;
@@ -310,7 +307,7 @@ void Response::fileNotFound(std::string root)
 	else
 		path = "../Network/html/404.html";
 	std::ifstream file(path);
-	if (file.fail())
+	if (!file.fail())
 		return;
 	else
 	{
@@ -321,6 +318,9 @@ void Response::fileNotFound(std::string root)
 			src += "\n";
 		}
 		_fileLength = src.length();
+		src = makeHeader(path, src);
+		_fileLength += src.find("\r\n\r\n");
+		_fileLength += 4;
 		_fileSrc = new char[_fileLength];
 		for (unsigned long i = 0; i < _fileLength; ++i)
 			_fileSrc[i] = src[i];
