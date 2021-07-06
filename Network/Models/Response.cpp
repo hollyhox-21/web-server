@@ -63,10 +63,12 @@ std::string Response::getdate()
 	return date;
 }
 
-std::string Response::makeHeader(std::string &uri, std::string &src)
+std::string Response::makeHeader(std::string &uri, std::string &src, std::string code)
 {
 	std::string header;
-	header += "HTTP/1.1 200 OK\r\n";
+	header += "HTTP/1.1 ";
+	header += code;
+	header += "\r\n";
 	header += "Date: ";
 	header += getdate();
 	header += "Server: WebServer By Monsters\r\n";
@@ -81,6 +83,8 @@ std::string Response::makeHeader(std::string &uri, std::string &src)
 		header += "Content-Type: image/jpeg\r\n";
 	header += "Client: Keep-Alive\r\n\r\n";
 	header += src;
+	_fileLength += src.find("\r\n\r\n");
+	_fileLength += 4;
 	return header;
 }
 
@@ -125,9 +129,7 @@ void Response::responseOnGet()
 							std::string dst(buff, len);
 							src += dst;
 						}
-						src = makeHeader(uri, src);
-						_fileLength += src.find("\r\n\r\n");
-						_fileLength += 4;
+						src = makeHeader(uri, src, "200 OK");
 						_fileSrc = new char[_fileLength];
 						for (unsigned long i = 0; i < _fileLength; ++i)
 							_fileSrc[i] = src[i];
@@ -173,9 +175,7 @@ void Response::responseOnGet()
 								src += one_line;
 							}
 							_fileLength = src.length();
-							src = makeHeader(path, src);
-							_fileLength += src.find("\r\n\r\n");
-							_fileLength += 4;
+							src = makeHeader(path, src, "200 OK");
 							_fileSrc = new char[_fileLength];
 							for (unsigned long i = 0; i < _fileLength; ++i)
 							{
@@ -247,10 +247,8 @@ void Response::responseOnPost()
 						char buff[1025];
 						std::string src;
 						int len;
-//						char dst[3000000];
 						while ((len = read(fd, buff, 1024)) > 0)
 						{
-//							(char*)memmove(dst + _fileLength, buff, len);
 							_fileLength += len;
 							std::string dst(buff, len);
 							src += dst;
@@ -302,25 +300,28 @@ void Response::fileNotFound(std::string root)
 	std::string path;
 	if (root.rfind('/') == (root.length() - 1))
 		root.erase(root.length() - 1);
-	if (it != _errorPage.end())
-		path = root + it->second;
-	else
+	path = root + it->second;
+	int fd = open(path.c_str(), O_RDONLY);
+	if (fd < 0)
+	{
 		path = "../Network/html/404.html";
-	std::ifstream file(path);
-	if (!file.fail())
-		return;
+		fd = open(path.c_str(), O_RDONLY);
+		if (fd < 0)
+			return;
+	}
 	else
 	{
-		std::string line, src;
-		while (getline(file, line))
+		char buff[1025];
+		std::string src;
+		int len;
+		while ((len = read(fd, buff, 1024)) > 0)
 		{
-			src += line;
-			src += "\n";
+			_fileLength += len;
+			std::string dst(buff, len);
+			src += dst;
 		}
 		_fileLength = src.length();
-		src = makeHeader(path, src);
-		_fileLength += src.find("\r\n\r\n");
-		_fileLength += 4;
+		src = makeHeader(path, src, "404 Not Found");
 		_fileSrc = new char[_fileLength];
 		for (unsigned long i = 0; i < _fileLength; ++i)
 			_fileSrc[i] = src[i];
