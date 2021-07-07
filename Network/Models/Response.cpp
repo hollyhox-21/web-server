@@ -79,8 +79,10 @@ std::string Response::makeHeader(std::string &uri, std::string &src, std::string
 	header += "\r\n";
 	if (uri.rfind(".html") != std::string::npos)
 		header += "Content-Type: text/html\r\n";
+	else if (uri.rfind(".png") != std::string::npos)
+		header += "Content-Type: image/png\r\n";
 	else
-		header += "Content-Type: image/jpeg\r\n";
+		header += "Content-Type: image/jpg\r\n";
 	header += "Client: Keep-Alive\r\n\r\n";
 	header += src;
 	_fileLength += src.find("\r\n\r\n");
@@ -260,6 +262,7 @@ void Response::responseOnPost()
 							src += body;
 							_fileLength += contLength;
 						}
+						src = makeHeader(uri, src, "200 OK");
 						_fileSrc = new char[_fileLength];
 						for (unsigned long i = 0; i < _fileLength; ++i)
 							_fileSrc[i] = src[i];
