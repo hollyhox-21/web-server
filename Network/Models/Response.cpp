@@ -63,25 +63,30 @@ std::string Response::getdate()
 	return date;
 }
 
-std::string Response::makeHeader(std::string &uri, std::string &src)
+std::string Response::makeHeader(std::string &uri, std::string &src, std::string code)
 {
 	std::string header;
-	header += "HTTP/1.1 200 OK\r\n";
+	header += "HTTP/1.1 ";
+	header += code;
+	header += "\r\n";
 	header += "Date: ";
 	header += getdate();
 	header += "Server: WebServer By Monsters\r\n";
 	header += "Last-Modified: ";
 	header += getdate();
-//			  "Wed, 22 Jul 2009 19:15:56 GMT\r\n";
 	header += "Content-Length: ";
 	header += std::to_string(_fileLength);
 	header += "\r\n";
 	if (uri.rfind(".html") != std::string::npos)
 		header += "Content-Type: text/html\r\n";
+	else if (uri.rfind(".png") != std::string::npos)
+		header += "Content-Type: image/png\r\n";
 	else
-		header += "Content-Type: image/jpeg\r\n";
+		header += "Content-Type: image/jpg\r\n";
 	header += "Client: Keep-Alive\r\n\r\n";
 	header += src;
+	_fileLength += src.find("\r\n\r\n");
+	_fileLength += 4;
 	return header;
 }
 
@@ -120,17 +125,13 @@ void Response::responseOnGet()
 						char buff[1025];
 						std::string src;
 						int len;
-//						char dst[3000000];
 						while ((len = read(fd, buff, 1024)) > 0)
 						{
-//							(char*)memmove(dst + _fileLength, buff, len);
 							_fileLength += len;
 							std::string dst(buff, len);
 							src += dst;
 						}
-						src = makeHeader(uri, src);
-						_fileLength += src.find("\r\n\r\n");
-						_fileLength += 4;
+						src = makeHeader(uri, src, "200 OK");
 						_fileSrc = new char[_fileLength];
 						for (unsigned long i = 0; i < _fileLength; ++i)
 							_fileSrc[i] = src[i];
@@ -176,9 +177,7 @@ void Response::responseOnGet()
 								src += one_line;
 							}
 							_fileLength = src.length();
-							src = makeHeader(path, src);
-							_fileLength += src.find("\r\n\r\n");
-							_fileLength += 5;
+							src = makeHeader(path, src, "200 OK");
 							_fileSrc = new char[_fileLength];
 							for (unsigned long i = 0; i < _fileLength; ++i)
 							{
@@ -250,10 +249,8 @@ void Response::responseOnPost()
 						char buff[1025];
 						std::string src;
 						int len;
-//						char dst[3000000];
 						while ((len = read(fd, buff, 1024)) > 0)
 						{
-//							(char*)memmove(dst + _fileLength, buff, len);
 							_fileLength += len;
 							std::string dst(buff, len);
 							src += dst;
@@ -265,6 +262,7 @@ void Response::responseOnPost()
 							src += body;
 							_fileLength += contLength;
 						}
+						src = makeHeader(uri, src, "200 OK");
 						_fileSrc = new char[_fileLength];
 						for (unsigned long i = 0; i < _fileLength; ++i)
 							_fileSrc[i] = src[i];
@@ -305,22 +303,28 @@ void Response::fileNotFound(std::string root)
 	std::string path;
 	if (root.rfind('/') == (root.length() - 1))
 		root.erase(root.length() - 1);
-	if (it != _errorPage.end())
-		path = root + it->second;
-	else
+	path = root + it->second;
+	int fd = open(path.c_str(), O_RDONLY);
+	if (fd < 0)
+	{
 		path = "../Network/html/404.html";
-	std::ifstream file(path);
-	if (file.fail())
-		return;
+		fd = open(path.c_str(), O_RDONLY);
+		if (fd < 0)
+			return;
+	}
 	else
 	{
-		std::string line, src;
-		while (getline(file, line))
+		char buff[1025];
+		std::string src;
+		int len;
+		while ((len = read(fd, buff, 1024)) > 0)
 		{
-			src += line;
-			src += "\n";
+			_fileLength += len;
+			std::string dst(buff, len);
+			src += dst;
 		}
 		_fileLength = src.length();
+		src = makeHeader(path, src, "404 Not Found");
 		_fileSrc = new char[_fileLength];
 		for (unsigned long i = 0; i < _fileLength; ++i)
 			_fileSrc[i] = src[i];

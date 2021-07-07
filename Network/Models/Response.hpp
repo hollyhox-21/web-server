@@ -33,7 +33,7 @@ private:
 	void responseOnPost();
 	void responseOnDelete();
 	void fileNotFound(std::string root);
-	std::string makeHeader(std::string &uri, std::string &src);
+	std::string makeHeader(std::string &uri, std::string &src, std::string code);
 	std::string getdate();
 public:
 	Response(Request &request, std::map<int, std::string> &errorPage, std::map<std::string, Location> &locations);
