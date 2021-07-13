@@ -30,7 +30,6 @@ private:
 	bool	_checkEndHeaders(std::string & buffer);
 	bool	_checkContentLength();
 	void	_parsHeaders(std::string & buffer);
-	void	_parsBody(std::string & buffer);
 	void	_parsFirstHeader(const std::string& buffer);
 	void	_mapingHeaders(std::string & buffer);
 	std::string _Key(std::string& buffer);
@@ -44,8 +43,10 @@ public:
 	std::string getProto() const;
 	std::string	getValueMapHeader(std::string key);
 	std::string	getBody() const;
-	
 	std::string getHeader() const;
+	
+	void	parsBody(std::string & buffer);
+
 	void	parsRequest(std::string & buffer);
 	void    printRequest();
 	void	printMap();

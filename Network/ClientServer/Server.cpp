@@ -60,6 +60,7 @@ void Server::readEvent(Client & connection) {
 	if (ret == -2) {
 		connection.getRequest().printRequest();
 		connection.getRequest().printMap();
+		std::cout << "Body: " << connection.getRequest().getBody() << std::endl;
 		connection.changeStage();
 	}
 	else if (ret == 0) {
