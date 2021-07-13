@@ -134,11 +134,11 @@ void Response::responseOnGet()
 							src += dst;
 						}
 						src = makeHeader(uri, src, "200 OK");
-						_fileLength = src.length() + 1;
-						_fileSrc = new char[_fileLength];
+						_fileLength = src.length();
+						_fileSrc = new char[_fileLength + 1];
 						for (unsigned long i = 0; i < _fileLength; ++i)
 							_fileSrc[i] = src[i];
-						_fileSrc[_fileLength - 1] = 0;
+						_fileSrc[_fileLength] = 0;
 					}
 				}
 				else if (buf.st_mode & S_IFDIR)
