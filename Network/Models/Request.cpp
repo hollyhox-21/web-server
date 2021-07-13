@@ -70,10 +70,10 @@ void Request::_parsHeaders(std::string &buffer) {
 //	printMap();
 }
 
-void Request::_parsBody(std::string &buffer) {
+void Request::parsBody(std::string &buffer) {
 	if (_header.empty())
 		_body = buffer.substr(0);
-	if (_body.length() != size_t(atoi(_mapHeaders["Content-Length"].c_str()))) {
+	if (buffer.length() != size_t(atoi(_mapHeaders["Content-Length"].c_str()))) {
 		_body += buffer.substr(0);
 	}
 }
@@ -112,17 +112,17 @@ void Request::parsRequest(std::string & buffer) {
 		_header.append(buffer.begin(), buffer.begin() + buffer.find(CRLF_END));
 		_parsHeaders(buffer);
 		if (_checkContentLength())
-			_parsBody(buffer);
+			parsBody(buffer);
 
-		printMap();
+		// printMap();
 	}
 	else if (_checkContentLength()) {
 //		_body = reinterpret_cast<unsigned char *>((new (unsigned char))[atoi(_mapHeaders["Content-Length"].c_str())]);
-		_parsBody(buffer);
+		parsBody(buffer);
 
 	}
 	else if (_checkContentLength())
-			_parsBody(buffer);
+			parsBody(buffer);
 	else {
 	
 	}

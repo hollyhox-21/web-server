@@ -1,7 +1,7 @@
 #include <vector>
 #include "Response.hpp"
 #include <fcntl.h>
-
+#include <cstdlib>
 
 Response::~Response()
 {
@@ -47,8 +47,8 @@ std::string Response::getdate()
 	std::tm *now = std::localtime(&t);
 	std::string date;
 	date += week[now->tm_wday];
-	date += ",";
-	date += now->tm_mday;
+	date += ", ";
+	date += std::to_string(now->tm_mon);
 	date += ' ';
 	date += month[now->tm_mon];
 	date += ' ';
@@ -60,6 +60,7 @@ std::string Response::getdate()
 	date += ':';
 	date += std::to_string(now->tm_sec);
 	date += " GMT\r\n";
+	std::cout << "|" << date << "|" << std::endl;
 	return date;
 }
 
@@ -69,11 +70,7 @@ std::string Response::makeHeader(std::string &uri, std::string &src, std::string
 	header += "HTTP/1.1 ";
 	header += code;
 	header += "\r\n";
-	header += "Date: ";
-	header += getdate();
-	header += "Server: WebServer By Monsters\r\n";
-	header += "Last-Modified: ";
-	header += getdate();
+	header += "Connection: Keep-Alive\r\n";
 	header += "Content-Length: ";
 	header += std::to_string(_fileLength);
 	header += "\r\n";
@@ -83,7 +80,12 @@ std::string Response::makeHeader(std::string &uri, std::string &src, std::string
 		header += "Content-Type: image/png\r\n";
 	else
 		header += "Content-Type: image/jpg\r\n";
-	header += "Client: Keep-Alive\r\n\r\n";
+	// header += "Date: ";
+	// header += getdate();
+	header += "Server: WebServer By Monsters\r\n";
+	// header += "Last-Modified: ";
+	// header += getdate();
+	header += "\r\n";
 	header += src;
 	_fileLength += src.find("\r\n\r\n");
 	_fileLength += 4;
@@ -132,9 +134,11 @@ void Response::responseOnGet()
 							src += dst;
 						}
 						src = makeHeader(uri, src, "200 OK");
-						_fileSrc = new char[_fileLength];
+						_fileLength = src.length();
+						_fileSrc = new char[_fileLength + 1];
 						for (unsigned long i = 0; i < _fileLength; ++i)
 							_fileSrc[i] = src[i];
+						_fileSrc[_fileLength] = 0;
 					}
 				}
 				else if (buf.st_mode & S_IFDIR)
