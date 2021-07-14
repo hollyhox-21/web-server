@@ -105,9 +105,9 @@ void Response::responseOnGet()
 			{
 				f = false;
 				uri = it->second.root;
-				if (uri.rfind('/') == (uri.length() - 1))
-					uri.erase(uri.length() - 1);
-				uri += _request.getUri();
+				std::cout << it->first << std::endl;
+				std::cout << uri << std::endl;
+				uri += _request.getUri().substr(it->first.length());
 				struct stat buf;
 				if (::stat(uri.c_str(), &buf) != 0)
 				{

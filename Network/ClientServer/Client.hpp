@@ -18,6 +18,8 @@ class Client {
 		std::string		_message;
 		Request			_req;
 		Response		*_res;
+
+		void			recvChunked();
 	public:
 		Client(int socket);
 		~Client();
