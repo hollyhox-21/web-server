@@ -80,15 +80,14 @@ std::string Response::makeHeader(std::string &uri, std::string &src, std::string
 		header += "Content-Type: image/png\r\n";
 	else
 		header += "Content-Type: image/jpg\r\n";
-	// header += "Date: ";
-	// header += getdate();
+	header += "Date: ";
+	header += getdate();
 	header += "Server: WebServer By Monsters\r\n";
-	// header += "Last-Modified: ";
-	// header += getdate();
+	header += "Last-Modified: ";
+	header += getdate();
 	header += "\r\n";
 	header += src;
-	_fileLength += src.find("\r\n\r\n");
-	_fileLength += 4;
+	_fileLength += header.length();
 	return header;
 }
 
@@ -105,8 +104,8 @@ void Response::responseOnGet()
 			{
 				f = false;
 				uri = it->second.root;
-				std::cout << it->first << std::endl;
-				std::cout << uri << std::endl;
+				if (_request.getUri().substr(it->first.length())[0] != '/')
+					uri += "/";
 				uri += _request.getUri().substr(it->first.length());
 				struct stat buf;
 				if (::stat(uri.c_str(), &buf) != 0)
@@ -134,7 +133,6 @@ void Response::responseOnGet()
 							src += dst;
 						}
 						src = makeHeader(uri, src, "200 OK");
-						_fileLength = src.length();
 						_fileSrc = new char[_fileLength + 1];
 						for (unsigned long i = 0; i < _fileLength; ++i)
 							_fileSrc[i] = src[i];
@@ -150,7 +148,7 @@ void Response::responseOnGet()
 						std::string src;
 						if ((dir = opendir(uri.c_str())) != NULL)
 						{
-							std::string path = "../Network/html/autoindex.html";
+							std::string path = "./Network/html/autoindex.html";
 							std::ifstream file(path);
 							if (file.fail())
 							{
@@ -311,7 +309,7 @@ void Response::fileNotFound(std::string root)
 	int fd = open(path.c_str(), O_RDONLY);
 	if (fd < 0)
 	{
-		path = "../Network/html/404.html";
+		path = "./Network/html/404.html";
 		fd = open(path.c_str(), O_RDONLY);
 		if (fd < 0)
 			return;
