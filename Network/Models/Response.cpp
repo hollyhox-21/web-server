@@ -1,7 +1,7 @@
 #include <vector>
 #include "Response.hpp"
 #include <fcntl.h>
-
+#include <cstdlib>
 
 Response::~Response()
 {
@@ -47,8 +47,8 @@ std::string Response::getdate()
 	std::tm *now = std::localtime(&t);
 	std::string date;
 	date += week[now->tm_wday];
-	date += ",";
-	date += now->tm_mday;
+	date += ", ";
+	date += std::to_string(now->tm_mon);
 	date += ' ';
 	date += month[now->tm_mon];
 	date += ' ';
@@ -60,6 +60,7 @@ std::string Response::getdate()
 	date += ':';
 	date += std::to_string(now->tm_sec);
 	date += " GMT\r\n";
+	std::cout << "|" << date << "|" << std::endl;
 	return date;
 }
 
@@ -69,11 +70,7 @@ std::string Response::makeHeader(std::string &uri, std::string &src, std::string
 	header += "HTTP/1.1 ";
 	header += code;
 	header += "\r\n";
-	header += "Date: ";
-	header += getdate();
-	header += "Server: WebServer By Monsters\r\n";
-	header += "Last-Modified: ";
-	header += getdate();
+	header += "Connection: Keep-Alive\r\n";
 	header += "Content-Length: ";
 	header += std::to_string(_fileLength);
 	header += "\r\n";
@@ -83,10 +80,14 @@ std::string Response::makeHeader(std::string &uri, std::string &src, std::string
 		header += "Content-Type: image/png\r\n";
 	else
 		header += "Content-Type: image/jpg\r\n";
-	header += "Client: Keep-Alive\r\n\r\n";
+	header += "Date: ";
+	header += getdate();
+	header += "Server: WebServer By Monsters\r\n";
+	header += "Last-Modified: ";
+	header += getdate();
+	header += "\r\n";
 	header += src;
-	_fileLength += src.find("\r\n\r\n");
-	_fileLength += 4;
+	_fileLength += header.length();
 	return header;
 }
 
@@ -103,9 +104,9 @@ void Response::responseOnGet()
 			{
 				f = false;
 				uri = it->second.root;
-				if (uri.rfind('/') == (uri.length() - 1))
-					uri.erase(uri.length() - 1);
-				uri += _request.getUri();
+				if (_request.getUri().substr(it->first.length())[0] != '/')
+					uri += "/";
+				uri += _request.getUri().substr(it->first.length());
 				struct stat buf;
 				if (::stat(uri.c_str(), &buf) != 0)
 				{
@@ -132,9 +133,10 @@ void Response::responseOnGet()
 							src += dst;
 						}
 						src = makeHeader(uri, src, "200 OK");
-						_fileSrc = new char[_fileLength];
+						_fileSrc = new char[_fileLength + 1];
 						for (unsigned long i = 0; i < _fileLength; ++i)
 							_fileSrc[i] = src[i];
+						_fileSrc[_fileLength] = 0;
 					}
 				}
 				else if (buf.st_mode & S_IFDIR)
@@ -146,7 +148,7 @@ void Response::responseOnGet()
 						std::string src;
 						if ((dir = opendir(uri.c_str())) != NULL)
 						{
-							std::string path = "../Network/html/autoindex.html";
+							std::string path = "./Network/html/autoindex.html";
 							std::ifstream file(path);
 							if (file.fail())
 							{
@@ -307,7 +309,7 @@ void Response::fileNotFound(std::string root)
 	int fd = open(path.c_str(), O_RDONLY);
 	if (fd < 0)
 	{
-		path = "../Network/html/404.html";
+		path = "./Network/html/404.html";
 		fd = open(path.c_str(), O_RDONLY);
 		if (fd < 0)
 			return;
