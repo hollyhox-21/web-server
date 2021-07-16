@@ -52,6 +52,8 @@ int		Client::recvMsg() {
 			if (_req.getValueMapHeader("Transfer-Encoding") == "chunked") {
 				recvChunked();
 			}
+			else if (_req.getValueMapHeader("Content-Length") == "")
+				return -2;
 			else {
 				int		contentLenght = atoi(_req.getValueMapHeader(std::string("Content-Length")).c_str());
 				char	bufferBody[contentLenght];
