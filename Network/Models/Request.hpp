@@ -43,11 +43,11 @@ public:
 	std::string	getValueMapHeader(std::string key);
 	std::string	getBody() const;
 	
-	std::string getHeader() const;
-	void	parsRequest(std::string & buffer );
+	std::string	getHeader() const;
+	void		parsRequest(std::string & buffer);
 	
-	void    printRequest();
-	void	printMap();
+	void		printRequest();
+	void		printMap();
 
 
 
