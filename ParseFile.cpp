@@ -5,6 +5,7 @@
 #include <string>
 #include <algorithm>
 #include <pthread.h>
+#include "ParseAuth.hpp"
 
 void *runServer(void *serv) {
 	((Server*)serv)->run();
@@ -188,9 +189,13 @@ std::vector<Server*> parser(std::string path)
 
 int main(int ac, char **av)
 {
-	(void)ac;
+	if (ac != 2) {
+		std::cout << "Wrong args" << std::endl;
+		return 1;
+	}
 	std::vector<Server*> serv;
 	serv = parser(av[1]);
+	parseAuth();
 	pthread_t s;
 	for (unsigned long i = 0; i < serv.size(); ++i)
 	{
