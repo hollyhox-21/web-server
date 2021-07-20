@@ -27,7 +27,6 @@ class Server : public IEventHandler {
 	public:
 		Server() { }
 		~Server() { delete( _serverSocket); }
-
 		void ready();
 
 	const std::map<int, std::string> &getErrorPages() const;
