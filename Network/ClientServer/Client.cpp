@@ -6,8 +6,32 @@ Client::Client(int socket) {
 }
 
 Client::~Client() {
-	std::cout << _socket << "Ya umer!" << std::endl;
 	close(_socket);
+}
+
+void	Client::recvChunked() {
+	int				nDataLength;
+	long			contentLenght = 0;
+	char			*p;
+	char			buffer[BUFFER_SIZE];
+	std::string		bufferLenght;
+	std::string		body;
+	const char		*konec;
+
+
+	do {
+		do {
+			nDataLength = recv(getSocket(), buffer, BUFFER_SIZE, 0);
+			bufferLenght.append(buffer);
+		} while ((konec = strstr(_message.c_str(), (const char*)"\r\n")) != NULL);
+		bufferLenght = bufferLenght.substr(0, konec - bufferLenght.c_str());
+		contentLenght = strtol(bufferLenght.c_str(), & p, 16);
+		char	bufferBody[contentLenght + 2];
+		nDataLength = recv(getSocket(), bufferBody, contentLenght + 2, 0);
+		body.append(konec + 2);
+		body.append(bufferBody);
+	} while (contentLenght > 0);
+	_req.parsBody(body);
 }
 
 int		Client::recvMsg() {
@@ -23,22 +47,28 @@ int		Client::recvMsg() {
 	if ((konec = strstr(_message.c_str(), (const char*)"\r\n\r\n")) != NULL) {
 		std::string body = std::string(konec + 4);
 		_message = _message.substr(0, konec + 4 - _message.c_str());
-		std::cout << _message << std::endl;
-		_req.parsRequest(_message, nDataLength);
+		_req.parsRequest(_message);
 		if (_req.getMethod() != "GET") {
-			int		contentLenght = atoi(_req.getValueMapHeader(std::string("Content-Length")).c_str());
-			char bufferBody[contentLenght];
-			nDataLength = recv(getSocket(), bufferBody, contentLenght, 0);
-			body.append(bufferBody, nDataLength);
-			std::cout << "Body: " << body <<  " " << nDataLength << " " << contentLenght << std::endl;
+			if (_req.getValueMapHeader("Transfer-Encoding") == "chunked") {
+				recvChunked();
+			}
+			else {
+				int		contentLenght = atoi(_req.getValueMapHeader(std::string("Content-Length")).c_str());
+				char	bufferBody[contentLenght];
+				nDataLength = recv(getSocket(), bufferBody, contentLenght, 0);
+				body.append(bufferBody, nDataLength);
+				_req.parsBody(body);
+			}
 		}
 		return -2;
 	}
 	return nDataLength;
 }
 
-int		Client::sendMsg(std::string const & value) {
-	return send(_socket, value.c_str(), value.length(), 0);
+int		Client::sendMsg() {
+	int result = send(_socket, _res->toFront().first, _res->toFront().second, 0);
+	delete(_res);
+	return result;
 }
 
 void	Client::changeStage() {
@@ -57,4 +87,8 @@ bool	Client::getStage() {
 	return _read;
 }
 
-
+void	Client::setResponse(std::map<int, std::string> & errPage, std::map<std::string, Location> & locations) {
+	_res = new Response(_req, errPage, locations);
+	std::cout << "\n\nResponse\n";
+	write(1, _res->toFront().first, _res->toFront().second);
+}

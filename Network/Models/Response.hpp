@@ -15,25 +15,26 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <unistd.h>
-
+#include <ctime>
 
 class Response
 {
 private:
-	std::string		_version;
-	int				_statusCode;
-	char			*_time;
-	std::string		_name;
-	int _fileLength;
+//	std::string		_version;
+//	int				_statusCode;
+//	char			*_time;
+//	std::string		_name;
+	unsigned long _fileLength;
 	char *_fileSrc;
-	std::vector<std::string> *_autoindex;
 	Request &_request;
 	std::map<int, std::string> &_errorPage;
 	std::map<std::string, Location> &_locations;
 	void responseOnGet();
 	void responseOnPost();
 	void responseOnDelete();
-	void reple(char *source, char *dest);
+	void fileNotFound(std::string root);
+	std::string makeHeader(std::string &uri, std::string &src, std::string code);
+	std::string getdate();
 public:
 	Response(Request &request, std::map<int, std::string> &errorPage, std::map<std::string, Location> &locations);
 	~Response();

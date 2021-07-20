@@ -9,6 +9,7 @@
 #include <map>
 #include <iostream>
 #include <cstdlib>
+#include <algorithm>
 
 #define CRLF "\r\n"
 #define CRLF_END "\r\n\r\n"
@@ -20,7 +21,8 @@ private:
     std::string _uri;
     std::string _proto;
 	
-	std::string 						_body;
+
+	std::string                         _body;
 	std::string							_header;
 	std::map<std::string, std::string>  _mapHeaders;
 	
@@ -28,7 +30,6 @@ private:
 	bool	_checkEndHeaders(std::string & buffer);
 	bool	_checkContentLength();
 	void	_parsHeaders(std::string & buffer);
-	void	_parsBody(std::string & buffer);
 	void	_parsFirstHeader(const std::string& buffer);
 	void	_mapingHeaders(std::string & buffer);
 	std::string _Key(std::string& buffer);
@@ -42,12 +43,13 @@ public:
 	std::string getProto() const;
 	std::string	getValueMapHeader(std::string key);
 	std::string	getBody() const;
+
+	std::string getHeader() const;
 	
-	std::string	getHeader() const;
-	void		parsRequest(std::string & buffer);
-	
-	void		printRequest();
-	void		printMap();
+	void	parsBody(std::string & buffer);
+	void	parsRequest(std::string & buffer);
+	void	printRequest();
+	void	printMap();
 
 
 
