@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include "Request.hpp"
+#include "../../CGI/CgiService.hpp"
 #include "Location.hpp"
 #include <map>
 #include <string>

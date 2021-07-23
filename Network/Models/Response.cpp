@@ -215,9 +215,9 @@ void Response::responseOnPost()
 			{
 				f = false;
 				uri = it->second.root;
-				if (uri.rfind('/') == (uri.length() - 1))
-					uri.erase(uri.length() - 1);
-				uri += _request.getUri();
+				if (_request.getUri().substr(it->first.length())[0] != '/')
+					uri += "/";
+				uri += _request.getUri().substr(it->first.length());
 				struct stat buf;
 				if (::stat(uri.c_str(), &buf) != 0)
 				{
@@ -226,50 +226,58 @@ void Response::responseOnPost()
 						fileNotFound(it->second.root);
 					else
 					{
-						std::string body = _request.getBody();
-						file << body;
-						_fileLength = atoi(_request.getValueMapHeader(
-								"Content-Length").c_str());
-						_fileSrc = new char[_fileLength];
-						for (unsigned long i = 0; i < _fileLength; ++i)
-							_fileSrc[i] = body[i];
+						std::string * a = CgiService::getCgiResponse(_request);
+						std::cout << "\n\nPOST CGI:\n\n" << *a;
+						// std::string body = _request.getBody();
+						// file << body;
+						// _fileLength = atoi(_request.getValueMapHeader(
+						// 		"Content-Length").c_str());
+						_fileSrc = new char[a->length()];
+						// for (unsigned long i = 0; i < _fileLength; ++i)
+						// 	_fileSrc[i] = body[i];
+						strcpy(_fileSrc, a->c_str());
 						file.close();
 						break;
 					}
 				}
 				if (buf.st_mode & S_IFREG)
 				{
-					int fd = open(uri.c_str(), O_RDWR);
-					if (fd < 0)
-					{
-						//TODO: add diff error
-						fileNotFound(it->second.root);
-						break;
-					}
-					else
-					{
-						char buff[1025];
-						std::string src;
-						int len;
-						while ((len = read(fd, buff, 1024)) > 0)
-						{
-							_fileLength += len;
-							std::string dst(buff, len);
-							src += dst;
-						}
-						int contLength = atoi(_request.getValueMapHeader("Content-Length").c_str());
-						if (contLength > 0)
-						{
-							std::string body = _request.getBody();
-							src += body;
-							_fileLength += contLength;
-						}
-						src = makeHeader(uri, src, "200 OK");
-						_fileSrc = new char[_fileLength];
-						for (unsigned long i = 0; i < _fileLength; ++i)
-							_fileSrc[i] = src[i];
-						write(fd, _fileSrc + (_fileLength - contLength), contLength);
-					}
+					std::string * a = CgiService::getCgiResponse(_request);
+					std::cout << "\n\nPOST CGI:\n\n" << *a;
+					_fileSrc = new char[a->length()];
+					strcpy(_fileSrc, a->c_str());
+					// int fd = open(uri.c_str(), O_RDWR);
+					// if (fd < 0)
+					// {
+					// 	//TODO: add diff error
+					// 	fileNotFound(it->second.root);
+					// 	break;
+					// }
+					// else
+					// {
+					// 	std::cout << "\n\nPOST 2:\n\n";
+					// 	char buff[1025];
+					// 	std::string src;
+					// 	int len;
+					// 	while ((len = read(fd, buff, 1024)) > 0)
+					// 	{
+					// 		_fileLength += len;
+					// 		std::string dst(buff, len);
+					// 		src += dst;
+					// 	}
+					// 	int contLength = atoi(_request.getValueMapHeader("Content-Length").c_str());
+					// 	if (contLength > 0)
+					// 	{
+					// 		std::string body = _request.getBody();
+					// 		src += body;
+					// 		_fileLength += contLength;
+					// 	}
+					// 	src = makeHeader(uri, src, "200 OK");
+					// 	_fileSrc = new char[_fileLength];
+					// 	for (unsigned long i = 0; i < _fileLength; ++i)
+					// 		_fileSrc[i] = src[i];
+					//	write(fd, _fileSrc + (_fileLength - contLength), contLength);
+					//	}
 				}
 				else if (buf.st_mode & S_IFDIR)
 				{

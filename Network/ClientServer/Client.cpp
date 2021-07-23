@@ -54,11 +54,14 @@ int		Client::recvMsg() {
 			}
 			else if (_req.getValueMapHeader("Content-Length") == "")
 				return -2;
-			else {
+			else if ((int)body.length() < atoi(_req.getValueMapHeader("Content-Length").c_str())){
+				std::cout << "begining" << std::endl;
 				int		contentLenght = atoi(_req.getValueMapHeader(std::string("Content-Length")).c_str());
 				char	bufferBody[contentLenght];
 				nDataLength = recv(getSocket(), bufferBody, contentLenght, 0);
 				body.append(bufferBody, nDataLength);
+			}
+			if ((int)body.length() == atoi(_req.getValueMapHeader("Content-Length").c_str())){
 				_req.parsBody(body);
 			}
 		}
