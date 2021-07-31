@@ -1,19 +1,4 @@
-#include <vector>
-#include <map>
-#include "Network/ClientServer/Server.hpp"
-
-#include <iostream>
-#include <string>
-#include <algorithm>
-#include <pthread.h>
-#include <cstdlib>
-
-
-
-void *runServer(void *serv) {
-	((Server*)serv)->run();
-	return NULL;
-}
+#include "ParseFile.hpp"
 
 //===============PRINT_RES================
 void	printLocations(std::map<std::string, Location> locations) {
@@ -268,36 +253,36 @@ int	startParser(char *fileName, std::vector<t_server> &servers) {
 	return (0);
 }
 
-int main(int ac, char **av) {
-	std::vector<t_server> structServers;
-	if (ac == 2) {
-		if (!startParser(av[1], structServers)){
-			std::vector<Server> Servers;
-			for (int i = 0; i < structServers.size(); ++i) {
-				Server obj(structServers[i]);
-				Servers.push_back(obj);
-			}
-		pthread_t s;
-		for (unsigned long i = 0; i < Servers.size(); ++i)
-		{
-			std::cout << i << std::endl;
-			Servers[i].ready();
-			pthread_create(&s, NULL, &runServer, &Servers[i]);
-		}
-		while (1)
-			;
-		}
-		else {
-			std::cout << "ERROR parse config" << std::endl;
-			return (1);
-		}
-	}
-	else {
-		std::cout << "wrong arguments" << std::endl;
-		return (1);
-	}
-	return (0);
-}
+//int main(int ac, char **av) {
+//	std::vector<t_server> structServers;
+//	if (ac == 2) {
+//		if (!startParser(av[1], structServers)){
+//			std::vector<Server> Servers;
+//			for (int i = 0; i < structServers.size(); ++i) {
+//				Server obj(structServers[i]);
+//				Servers.push_back(obj);
+//			}
+//		pthread_t s;
+//		for (unsigned long i = 0; i < Servers.size(); ++i)
+//		{
+//			std::cout << i << std::endl;
+//			Servers[i].ready();
+//			pthread_create(&s, NULL, &runServer, &Servers[i]);
+//		}
+//		while (1)
+//			;
+//		}
+//		else {
+//			std::cout << "ERROR parse config" << std::endl;
+//			return (1);
+//		}
+//	}
+//	else {
+//		std::cout << "wrong arguments" << std::endl;
+//		return (1);
+//	}
+//	return (0);
+//}
 
 //std::string pars_one_arg(std::string &line)
 //{
