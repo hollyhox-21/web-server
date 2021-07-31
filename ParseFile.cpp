@@ -1,25 +1,19 @@
 #include <vector>
 #include <map>
 #include "Network/ClientServer/Server.hpp"
+
 #include <iostream>
-#include <fstream>
 #include <string>
 #include <algorithm>
 #include <pthread.h>
 #include <cstdlib>
 
-typedef struct s_server {
-	std::string						name;
-	std::string						host;
-	int								port;
-	std::map<int, std::string>		errorPages;
-	std::map<std::string, Location>	locations;
-} t_server;
 
-//void *runServer(void *serv) {
-//	((Server*)serv)->run();
-//	return NULL;
-//}
+
+void *runServer(void *serv) {
+	((Server*)serv)->run();
+	return NULL;
+}
 
 //===============PRINT_RES================
 void	printLocations(std::map<std::string, Location> locations) {
@@ -274,20 +268,21 @@ int	startParser(char *fileName, std::vector<t_server> &servers) {
 	return (0);
 }
 
-int main(int ac, char **av)
-{
-	std::vector<t_server> servers;
-	
+int main(int ac, char **av) {
+	std::vector<t_server> structServers;
 	if (ac == 2) {
-		if (!startParser(av[1], servers)){
-//			printServers(servers);
-//			std::cout << "END\tpars" << std::endl;
+		if (!startParser(av[1], structServers)){
+			std::vector<Server> Servers;
+			for (int i = 0; i < structServers.size(); ++i) {
+				Server obj(structServers[i]);
+				Servers.push_back(obj);
+			}
 		pthread_t s;
-		for (unsigned long i = 0; i < servers.size(); ++i)
+		for (unsigned long i = 0; i < Servers.size(); ++i)
 		{
 			std::cout << i << std::endl;
-			server[i]->ready();
-			pthread_create(&s, NULL, &runServer, serv[i]);
+			Servers[i].ready();
+			pthread_create(&s, NULL, &runServer, &Servers[i]);
 		}
 		while (1)
 			;
@@ -643,4 +638,3 @@ int main(int ac, char **av)
 //	 ;
 //	return 0;
 //}
-
