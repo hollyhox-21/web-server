@@ -94,6 +94,8 @@ bool	Client::getStage() {
 
 void	Client::setResponse(std::map<int, std::string> & errPage, std::map<std::string, Location> & locations) {
 	_res = new Response(_req, errPage, locations);
-	std::cout << "\n\nResponse\n";
-	write(1, _res->toFront().first, _res->toFront().second);
+	if (std::string(_res->toFront().first).find("text/html") != std::string::npos) {
+		std::cout << "\n\nResponse\n";
+		write(1, _res->toFront().first, _res->toFront().second);
+	}
 }
