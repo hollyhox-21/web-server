@@ -78,8 +78,10 @@ std::string Response::makeHeader(std::string &uri, std::string &src, std::string
 		header += "Content-Type: text/html\r\n";
 	else if (uri.rfind(".png") != std::string::npos)
 		header += "Content-Type: image/png\r\n";
-	else
+	else if (uri.rfind(".jpg") != std::string::npos)
 		header += "Content-Type: image/jpg\r\n";
+	else
+		header += "Content-Type: text/html\r\n";
 	header += "Date: ";
 	header += getdate();
 	header += "Server: WebServer By Monsters\r\n";
@@ -300,7 +302,61 @@ void Response::responseOnPost()
 
 void Response::responseOnDelete()
 {
-
+	bool f = true;
+	std::string uri = _request.getUri();
+	while (!uri.empty() && f)
+	{
+		for (std::map<std::string, Location>::iterator it = _locations.begin();
+			 it != _locations.end(); ++it)
+		{
+			if (it->first.find(uri) != std::string::npos)
+			{
+				f = false;
+				uri = it->second.root;
+				if (_request.getUri().substr(it->first.length())[0] != '/')
+					uri += "/";
+				uri += _request.getUri().substr(it->first.length());
+				struct stat buf;
+				if (::stat(uri.c_str(), &buf) != 0)
+				{
+					fileNotFound(it->second.root);
+					break;
+				}
+				if (buf.st_mode & S_IFREG)
+				{
+					if (remove(uri.c_str()))
+					{
+						fileNotFound(it->second.root);
+						break;
+					}
+				}
+				else if (buf.st_mode & S_IFDIR)
+				{
+					fileNotFound(it->second.root);
+					break;
+				}
+				std::string body = "<html>\n"
+						  "\t<body>\n"
+						  "\t\t<h1>File deleted.</h1>\n"
+						  "\t</body>\n"
+						  "</html>";
+				_fileLength = body.length();
+				std::string header = makeHeader(uri, body, "200 OK");
+				_fileSrc = new char[header.length() + 1];
+				for (int i = 0; i < _fileLength; ++i)
+					_fileSrc[i] = header[i];
+				_fileSrc[_fileLength] = 0;
+				std::cout << _fileSrc;
+				break;
+			}
+		}
+		if (uri != "/" && !uri.empty())
+		{
+			uri.erase(uri.rfind('/') + 1, uri.length());
+			if (uri != "/")
+				uri.erase(uri.rfind('/'));
+		}
+	}
 }
 
 std::pair<char *, int> Response::toFront()
