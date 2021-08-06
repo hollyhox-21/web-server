@@ -60,7 +60,7 @@ std::string Response::getdate()
 	date += ':';
 	date += std::to_string(now->tm_sec);
 	date += " GMT\r\n";
-	std::cout << "|" << date << "|" << std::endl;
+	// std::cout << "|" << date << "|" << std::endl;
 	return date;
 }
 
@@ -133,6 +133,7 @@ void Response::responseOnGet()
 							src += dst;
 						}
 						src = makeHeader(uri, src, "200 OK");
+						_fileLength = src.length();
 						_fileSrc = new char[_fileLength + 1];
 						for (unsigned long i = 0; i < _fileLength; ++i)
 							_fileSrc[i] = src[i];
@@ -178,13 +179,14 @@ void Response::responseOnGet()
 								one_line += "\n";
 								src += one_line;
 							}
-							_fileLength = src.length();
 							src = makeHeader(path, src, "200 OK");
-							_fileSrc = new char[_fileLength];
+							_fileLength = src.length();
+							_fileSrc = new char[_fileLength + 1];
 							for (unsigned long i = 0; i < _fileLength; ++i)
 							{
 								_fileSrc[i] = src[i];
 							}
+							_fileSrc[_fileLength] = 0;
 						}
 					}
 					else if (uri == "/")
