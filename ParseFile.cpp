@@ -230,7 +230,6 @@ t_server parsBuf(std::string &buf) {
 	}
 	return (server);
 }
-
 int	startParser(char *fileName, std::vector<t_server> &servers) {
 	std::ifstream	parsFile(fileName);
 	std::string		buf;
