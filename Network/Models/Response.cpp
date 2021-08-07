@@ -80,6 +80,8 @@ std::string Response::makeHeader(std::string &uri, std::string &src, std::string
 		header += "Content-Type: image/png\r\n";
 	else if (uri.rfind(".jpg") != std::string::npos)
 		header += "Content-Type: image/jpg\r\n";
+	else if (uri.rfind(".ico") != std::string::npos)
+		header += "Content-Type: image/ico\r\n";
 	else
 		header += "Content-Type: text/html\r\n";
 	header += "Date: ";
@@ -342,8 +344,9 @@ void Response::responseOnDelete()
 						  "</html>";
 				_fileLength = body.length();
 				std::string header = makeHeader(uri, body, "200 OK");
-				_fileSrc = new char[header.length() + 1];
-				for (int i = 0; i < _fileLength; ++i)
+				_fileLength = header.length();
+				_fileSrc = new char[_fileLength + 1];
+				for (size_t i = 0; i < _fileLength; ++i)
 					_fileSrc[i] = header[i];
 				_fileSrc[_fileLength] = 0;
 				std::cout << _fileSrc;
