@@ -80,6 +80,8 @@ std::string Response::makeHeader(std::string &uri, std::string &src, std::string
 		header += "Content-Type: image/png\r\n";
 	else if (uri.rfind(".jpg") != std::string::npos)
 		header += "Content-Type: image/jpg\r\n";
+	else if (uri.rfind(".jpeg") != std::string::npos)
+		header += "Content-Type: image/jpg\r\n";
 	else if (uri.rfind(".ico") != std::string::npos)
 		header += "Content-Type: image/ico\r\n";
 	else
@@ -95,6 +97,33 @@ std::string Response::makeHeader(std::string &uri, std::string &src, std::string
 	return header;
 }
 
+void	Response::generateResponse(std::string uri, std::map<std::string, Location>::iterator it)
+{
+	int fd = open(uri.c_str(), O_RDONLY);
+	if (fd < 0)
+	{
+		fileNotFound(it->second.root);
+		return;
+	} else
+	{
+		char buff[1025];
+		std::string src;
+		int len;
+		while ((len = read(fd, buff, 1024)) > 0)
+		{
+			_fileLength += len;
+			std::string dst(buff, len);
+			src += dst;
+		}
+		src = makeHeader(uri, src, "200 OK");
+		_fileLength = src.length();
+		_fileSrc = new char[_fileLength + 1];
+		for (unsigned long i = 0; i < _fileLength; ++i)
+			_fileSrc[i] = src[i];
+		_fileSrc[_fileLength] = 0;
+	}
+}
+
 void Response::responseOnGet()
 {
 	bool f = true;
@@ -104,6 +133,11 @@ void Response::responseOnGet()
 		for (std::map<std::string, Location>::iterator it = _locations.begin();
 			 it != _locations.end(); ++it)
 		{
+			if (!it->second.methods.at("GET"))
+			{
+				methodnotallowed(it->second.root);
+				break;
+			}
 			if (it->first.find(uri) != std::string::npos)
 			{
 				f = false;
@@ -119,30 +153,7 @@ void Response::responseOnGet()
 				}
 				if (buf.st_mode & S_IFREG)
 				{
-					int fd = open(uri.c_str(), O_RDONLY);
-					if (fd < 0)
-					{
-						fileNotFound(it->second.root);
-						break;
-					}
-					else
-					{
-						char buff[1025];
-						std::string src;
-						int len;
-						while ((len = read(fd, buff, 1024)) > 0)
-						{
-							_fileLength += len;
-							std::string dst(buff, len);
-							src += dst;
-						}
-						src = makeHeader(uri, src, "200 OK");
-						_fileLength = src.length();
-						_fileSrc = new char[_fileLength + 1];
-						for (unsigned long i = 0; i < _fileLength; ++i)
-							_fileSrc[i] = src[i];
-						_fileSrc[_fileLength] = 0;
-					}
+					generateResponse(uri, it);
 				}
 				else if (buf.st_mode & S_IFDIR)
 				{
@@ -153,7 +164,7 @@ void Response::responseOnGet()
 						std::string src;
 						if ((dir = opendir(uri.c_str())) != NULL)
 						{
-							std::string path = "./Network/html/autoindex.html";
+							std::string path = it->second.root + "/www/html/autoindex.html";
 							std::ifstream file(path);
 							if (file.fail())
 							{
@@ -172,7 +183,11 @@ void Response::responseOnGet()
 							while ((ent = readdir(dir)) != NULL)
 							{
 								std::string pre = "\t\t\t<li class=\"files\"><a href=\"";
-								pre += it->first;
+								std::string path_dir = _request.getUri();
+								if (path_dir[path_dir.length() - 1] == '/')
+									pre += _request.getUri() + ent->d_name;
+								else
+									pre += _request.getUri() + '/' + ent->d_name;
 								pre += "\">";
 								pre += ent->d_name;
 								pre += "</a></li>\n";
@@ -183,16 +198,17 @@ void Response::responseOnGet()
 								one_line += "\n";
 								src += one_line;
 							}
+							_fileLength = src.length();
 							src = makeHeader(path, src, "200 OK");
 							_fileLength = src.length();
 							_fileSrc = new char[_fileLength + 1];
 							for (unsigned long i = 0; i < _fileLength; ++i)
-							{
 								_fileSrc[i] = src[i];
-							}
 							_fileSrc[_fileLength] = 0;
 						}
 					}
+					else if (it->second.autoindex.find("off", 0, 2) != std::string::npos)
+						generateResponse(it->second.root + it->second.index, it);
 					else if (uri == "/")
 						uri = "";
 				}
@@ -396,6 +412,39 @@ void Response::fileNotFound(std::string root)
 		}
 		_fileLength = src.length();
 		src = makeHeader(path, src, "404 Not Found");
+		_fileSrc = new char[_fileLength];
+		for (unsigned long i = 0; i < _fileLength; ++i)
+			_fileSrc[i] = src[i];
+	}
+}
+
+
+void Response::methodnotallowed(std::string root)
+{
+	std::map<int, std::string>::iterator it = _errorPage.begin();
+	for (; it != _errorPage.end() && it->first != 405; ++it) {	}
+	std::string path;
+	if (root.rfind('/') == (root.length() - 1))
+		root.erase(root.length() - 1);
+	path = root + it->second;
+	int fd = open(path.c_str(), O_RDONLY);
+	if (fd < 0)
+	{
+		fileNotFound(root);
+	}
+	else
+	{
+		char buff[1025];
+		std::string src;
+		int len;
+		while ((len = read(fd, buff, 1024)) > 0)
+		{
+			_fileLength += len;
+			std::string dst(buff, len);
+			src += dst;
+		}
+		_fileLength = src.length();
+		src = makeHeader(path, src, "405 Method Not Allowed");
 		_fileSrc = new char[_fileLength];
 		for (unsigned long i = 0; i < _fileLength; ++i)
 			_fileSrc[i] = src[i];

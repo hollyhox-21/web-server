@@ -1,15 +1,15 @@
 server:
 	server_name: testing
 	host: 127.0.0.1
-	error_page: 404=/custom_error/page_404.html 405=/test/page_405.html
+	error_page: 404=/Network/html/404.html 405=/test/page_405.html
 	port: 8000
 
-	location: /test/bla
+	location: /
 		limits_client_body_size: 2000
 		autoindex: on
-		index: index.html
+		index: /www/html/index.html
 		allow_methods: GET POST
-		root: /Users/ptycho/Documents/42cursus/web-server
+		root: /Users/ptycho/Documents/42cursus/web_server
 		path_cgi: /bin/cgi
 
 	location: /data
@@ -17,7 +17,7 @@ server:
 		autoindex: off
 		index: /usr/index.html
 		allow_methods: POST DELETE
-		root: /Users/ptycho/Documents
+		root: /Users/ptycho/Documents/42cursus/web_server
 		path_cgi: /bin/cgi/test
 
 server:
