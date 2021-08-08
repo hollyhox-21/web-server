@@ -9,17 +9,19 @@ int main(int ac, char **av) {
 	std::vector<t_server> structServers;
 	if (ac == 2) {
 		if (!startParser(av[1], structServers)){
-			std::vector<Server> Servers;
-			for (int i = 0; i < structServers.size(); ++i) {
-				Server obj(structServers[i]);
-				Servers.push_back(obj);
+			std::vector<Server*> Servers;
+//			for (auto i = structServers.begin(); i != structServers.end() ; ++i) {
+//				printServ(*i);
+//			}
+			for (size_t i = 0; i < structServers.size(); ++i) {
+				Servers.push_back(new Server(structServers[i]));
 			}
 			pthread_t s;
-			for (unsigned long i = 0; i < Servers.size(); ++i)
+			for (size_t i = 0; i < Servers.size(); ++i)
 			{
 				std::cout << i << std::endl;
-				Servers[i].ready();
-				pthread_create(&s, NULL, &runServer, &Servers[i]);
+				Servers[i]->ready();
+				pthread_create(&s, NULL, &runServer, Servers[i]);
 			}
 			while (1)
 				;

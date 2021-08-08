@@ -33,9 +33,12 @@ private:
 	void responseOnGet();
 	void responseOnPost();
 	void responseOnDelete();
+	void responseOnPut();
 	void fileNotFound(std::string root);
+	void methodnotallowed(std::string root);
 	std::string makeHeader(std::string &uri, std::string &src, std::string code);
 	std::string getdate();
+	void	generateResponse(std::string uri, std::map<std::string, Location>::iterator it);
 public:
 	Response(Request &request, std::map<int, std::string> &errorPage, std::map<std::string, Location> &locations);
 	~Response();
