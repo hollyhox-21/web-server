@@ -43,12 +43,12 @@ public:
 	std::string getProto() const;
 	std::string	getValueMapHeader(std::string key);
 	std::string	getBody() const;
+
 	std::string getHeader() const;
 	
 	void	parsBody(std::string & buffer);
-
 	void	parsRequest(std::string & buffer);
-	void    printRequest();
+	void	printRequest();
 	void	printMap();
 
 

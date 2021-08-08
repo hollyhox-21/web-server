@@ -71,11 +71,7 @@ void Request::_parsHeaders(std::string &buffer) {
 }
 
 void Request::parsBody(std::string &buffer) {
-	if (_header.empty())
-		_body = buffer.substr(0);
-	if (buffer.length() != size_t(atoi(_mapHeaders["Content-Length"].c_str()))) {
-		_body += buffer.substr(0);
-	}
+	_body += buffer.substr(0);
 }
 
 

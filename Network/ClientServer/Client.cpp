@@ -52,11 +52,16 @@ int		Client::recvMsg() {
 			if (_req.getValueMapHeader("Transfer-Encoding") == "chunked") {
 				recvChunked();
 			}
-			else {
+			else if (_req.getValueMapHeader("Content-Length") == "")
+				return -2;
+			else if ((int)body.length() < atoi(_req.getValueMapHeader("Content-Length").c_str())){
+				std::cout << "begining" << std::endl;
 				int		contentLenght = atoi(_req.getValueMapHeader(std::string("Content-Length")).c_str());
 				char	bufferBody[contentLenght];
 				nDataLength = recv(getSocket(), bufferBody, contentLenght, 0);
 				body.append(bufferBody, nDataLength);
+			}
+			if ((int)body.length() == atoi(_req.getValueMapHeader("Content-Length").c_str())){
 				_req.parsBody(body);
 			}
 		}
@@ -89,6 +94,8 @@ bool	Client::getStage() {
 
 void	Client::setResponse(std::map<int, std::string> & errPage, std::map<std::string, Location> & locations) {
 	_res = new Response(_req, errPage, locations);
-	std::cout << "\n\nResponse\n";
-	write(1, _res->toFront().first, _res->toFront().second);
+	if (_res->toFront().first != NULL && std::string(_res->toFront().first).find("text/html") != std::string::npos) {
+		std::cout << "\n\nResponse\n";
+		write(1, _res->toFront().first, _res->toFront().second);
+	}
 }

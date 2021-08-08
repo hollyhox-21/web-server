@@ -11,7 +11,15 @@
 #include "../Models/Location.hpp"
 #include "../Models/Request.hpp"
 
-class Server : public IEventHandler {
+typedef struct s_server {
+	std::string						name;
+	std::string						host;
+	int								port;
+	std::map<int, std::string>		errorPages;
+	std::map<std::string, Location>	locations;
+} t_server;
+
+class Server : public IEventHandler{
 	private:
 		ServerSocket					*_serverSocket;
 		std::string						_name;
@@ -25,9 +33,15 @@ class Server : public IEventHandler {
 		int								_fdMax;
 
 	public:
-		Server() { }
+		Server(t_server & server) {
+			_name = server.name;
+			_host = server.host;
+			_port = server.port;
+			_errorPages = server.errorPages;
+			_locations = server.locations;
+		}
+		
 		~Server() { delete( _serverSocket); }
-
 		void ready();
 
 	const std::map<int, std::string> &getErrorPages() const;
