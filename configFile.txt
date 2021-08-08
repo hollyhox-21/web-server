@@ -8,7 +8,7 @@ server:
 		limits_client_body_size: 2000
 		autoindex: on
 		index: /www/html/index.html
-		allow_methods: POST DELETE
+		allow_methods: POST DELETE GET
 		root: /Users/ptycho/Documents/42cursus/web_server
 		path_cgi: /bin/cgi
 

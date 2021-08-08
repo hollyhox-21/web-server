@@ -1,10 +1,36 @@
-#include "Network/Network.hpp"
+#include "ParseFile.hpp"
 
-int main() {
+void *runServer(void *serv) {
+	((Server*)serv)->run();
+	return NULL;
+}
 
-	std::map<int, std::string>		erorPages;
-	std::map<std::string, Location> locations;
-	Server servak = Server("127.0.0.1", 1080, erorPages, locations);
-	servak.run();
-	return 0;
+int main(int ac, char **av) {
+	std::vector<t_server> structServers;
+	if (ac == 2) {
+		if (!startParser(av[1], structServers)){
+			std::vector<Server*> Servers;
+			for (size_t i = 0; i < structServers.size(); ++i) {
+				Servers.push_back(new Server(structServers[i]));
+			}
+			pthread_t s;
+			for (size_t i = 0; i < Servers.size(); ++i)
+			{
+				std::cout << i << std::endl;
+				Servers[i]->ready();
+				pthread_create(&s, NULL, &runServer, Servers[i]);
+			}
+			while (1)
+				;
+		}
+		else {
+			std::cout << "ERROR parse config" << std::endl;
+			return (1);
+		}
+	}
+	else {
+		std::cout << "wrong arguments" << std::endl;
+		return (1);
+	}
+	return (0);
 }
