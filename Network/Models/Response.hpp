@@ -33,6 +33,7 @@ private:
 	void responseOnGet();
 	void responseOnPost();
 	void responseOnDelete();
+	void responseOnPut();
 	void fileNotFound(std::string root);
 	void methodnotallowed(std::string root);
 	std::string makeHeader(std::string &uri, std::string &src, std::string code);

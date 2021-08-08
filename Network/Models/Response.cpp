@@ -16,6 +16,8 @@ Response::Response(Request &request, std::map<int, std::string> &errorPage, std:
 		responseOnPost();
 	else if (request.getMethod().find("DELETE", 0, 6) != std::string::npos)
 		responseOnDelete();
+	else if (request.getMethod().find("PUT", 0, 3) != std::string::npos)
+		responseOnPut();
 }
 
 char month[12][4] = {"Jan",
@@ -133,14 +135,14 @@ void Response::responseOnGet()
 		for (std::map<std::string, Location>::iterator it = _locations.begin();
 			 it != _locations.end(); ++it)
 		{
-			if (!it->second.methods.at("GET"))
-			{
-				methodnotallowed(it->second.root);
-				break;
-			}
 			if (it->first.find(uri) != std::string::npos)
 			{
 				f = false;
+				if (!it->second.methods.at("GET"))
+				{
+					methodnotallowed(it->second.root);
+					break;
+				}
 				uri = it->second.root;
 				if (_request.getUri().substr(it->first.length())[0] != '/')
 					uri += "/";
@@ -174,8 +176,7 @@ void Response::responseOnGet()
 							std::string one_line;
 							while (getline(file, one_line))
 							{
-								if (one_line.find("<$ListOfFiles>") !=
-									std::string::npos)
+								if (one_line.find("<$ListOfFiles>") != std::string::npos)
 									break;
 								one_line += "\n";
 								src += one_line;
@@ -236,6 +237,11 @@ void Response::responseOnPost()
 			if (it->first.find(uri) != std::string::npos)
 			{
 				f = false;
+				if (!it->second.methods.at("POST"))
+				{
+					methodnotallowed(it->second.root);
+					break;
+				}
 				uri = it->second.root;
 				if (_request.getUri().substr(it->first.length())[0] != '/')
 					uri += "/";
@@ -318,6 +324,11 @@ void Response::responseOnPost()
 	}
 }
 
+void Response::responseOnPut()
+{
+
+}
+
 void Response::responseOnDelete()
 {
 	bool f = true;
@@ -330,6 +341,11 @@ void Response::responseOnDelete()
 			if (it->first.find(uri) != std::string::npos)
 			{
 				f = false;
+				if (!it->second.methods.at("DELETE"))
+				{
+					methodnotallowed(it->second.root);
+					break;
+				}
 				uri = it->second.root;
 				if (_request.getUri().substr(it->first.length())[0] != '/')
 					uri += "/";
@@ -412,9 +428,11 @@ void Response::fileNotFound(std::string root)
 		}
 		_fileLength = src.length();
 		src = makeHeader(path, src, "404 Not Found");
+		_fileLength = src.length();
 		_fileSrc = new char[_fileLength];
 		for (unsigned long i = 0; i < _fileLength; ++i)
 			_fileSrc[i] = src[i];
+		_fileSrc[_fileLength] = 0;
 	}
 }
 
@@ -445,8 +463,10 @@ void Response::methodnotallowed(std::string root)
 		}
 		_fileLength = src.length();
 		src = makeHeader(path, src, "405 Method Not Allowed");
+		_fileLength = src.length();
 		_fileSrc = new char[_fileLength];
 		for (unsigned long i = 0; i < _fileLength; ++i)
 			_fileSrc[i] = src[i];
+		_fileSrc[_fileLength] = 0;
 	}
 }
