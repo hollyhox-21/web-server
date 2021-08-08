@@ -10,7 +10,7 @@ server:
 		index: /www/html/index.html
 		allow_methods: POST DELETE
 		root: /Users/ptycho/Documents/42cursus/web_server
-		path_cgi: /bin/cgi
+		path_cgi: .py /bin/cgi
 
 	location: /data
 		limits_client_body_size: 1111
