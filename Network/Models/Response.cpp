@@ -8,7 +8,7 @@ Response::~Response()
 	delete[] _fileSrc;
 }
 
-Response::Response(Request &request, std::map<int, std::string> &errorPage, std::map<std::string, Location> &locations) : _fileLength(0), _fileSrc(NULL), _request(request), _errorPage(errorPage), _locations(locations)
+Response::Response(Request &request, t_server & serverSettings) : _fileLength(0), _fileSrc(NULL), _request(request), _serverSettings(serverSettings)
 {
 	if (request.getMethod().find("GET", 0, 3) != std::string::npos)
 		responseOnGet();
@@ -132,8 +132,8 @@ void Response::responseOnGet()
 	std::string uri = _request.getUri();
 	while (!uri.empty() && f)
 	{
-		for (std::map<std::string, Location>::iterator it = _locations.begin();
-			 it != _locations.end(); ++it)
+		for (std::map<std::string, Location>::iterator it = _serverSettings.locations.begin();
+			 it != _serverSettings.locations.end(); ++it)
 		{
 			if (it->first.find(uri) != std::string::npos)
 			{
@@ -231,8 +231,8 @@ void Response::responseOnPost()
 	bool f = true;
 	while (!uri.empty() && f)
 	{
-		for (std::map<std::string, Location>::iterator it = _locations.begin();
-			 it != _locations.end(); ++it)
+		for (std::map<std::string, Location>::iterator it = _serverSettings.locations.begin();
+			 it != _serverSettings.locations.end(); ++it)
 		{
 			if (it->first.find(uri) != std::string::npos)
 			{
@@ -254,8 +254,8 @@ void Response::responseOnPost()
 						fileNotFound(it->second.root);
 					else
 					{
-						std::string * a = CgiService::getCgiResponse(_request);
-						std::cout << "\n\nPOST CGI:\n\n" << *a;
+						std::string * a = CgiService::getCgiResponse(_request, _serverSettings);
+						std::cout << "\n\nPOST CGI:\n\n" << "|" << *a << "|\n";
 						// std::string body = _request.getBody();
 						// file << body;
 						// _fileLength = atoi(_request.getValueMapHeader(
@@ -270,8 +270,8 @@ void Response::responseOnPost()
 				}
 				if (buf.st_mode & S_IFREG)
 				{
-					std::string * a = CgiService::getCgiResponse(_request);
-					std::cout << "\n\nPOST CGI:\n\n" << *a;
+					std::string * a = CgiService::getCgiResponse(_request, _serverSettings);
+					std::cout << "\n\nPOST CGI:\n\n" << "|" << *a << "|\n";
 					_fileSrc = new char[a->length()];
 					strcpy(_fileSrc, a->c_str());
 					// int fd = open(uri.c_str(), O_RDWR);
@@ -335,8 +335,8 @@ void Response::responseOnDelete()
 	std::string uri = _request.getUri();
 	while (!uri.empty() && f)
 	{
-		for (std::map<std::string, Location>::iterator it = _locations.begin();
-			 it != _locations.end(); ++it)
+		for (std::map<std::string, Location>::iterator it = _serverSettings.locations.begin();
+			 it != _serverSettings.locations.end(); ++it)
 		{
 			if (it->first.find(uri) != std::string::npos)
 			{
@@ -401,8 +401,8 @@ std::pair<char *, int> Response::toFront()
 
 void Response::fileNotFound(std::string root)
 {
-	std::map<int, std::string>::iterator it = _errorPage.begin();
-	for (; it != _errorPage.end() && it->first != 404; ++it) {	}
+	std::map<int, std::string>::iterator it = _serverSettings.errorPages.begin();
+	for (; it != _serverSettings.errorPages.end() && it->first != 404; ++it) {	}
 	std::string path;
 	if (root.rfind('/') == (root.length() - 1))
 		root.erase(root.length() - 1);
@@ -439,8 +439,8 @@ void Response::fileNotFound(std::string root)
 
 void Response::methodnotallowed(std::string root)
 {
-	std::map<int, std::string>::iterator it = _errorPage.begin();
-	for (; it != _errorPage.end() && it->first != 405; ++it) {	}
+	std::map<int, std::string>::iterator it = _serverSettings.errorPages.begin();
+	for (; it != _serverSettings.errorPages.end() && it->first != 405; ++it) {	}
 	std::string path;
 	if (root.rfind('/') == (root.length() - 1))
 		root.erase(root.length() - 1);
