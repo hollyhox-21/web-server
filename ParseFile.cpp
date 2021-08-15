@@ -7,7 +7,7 @@ void	printLocations(std::map<std::string, Location> locations) {
 		std::cout << "\n";
 		std::cout << "Location: " << i->first << std::endl;
 		std::cout << "ROOT\t" << i->second.getRoot() << std::endl;
-		std::cout << "CGI\t\t" << i->second.getPathCGI() << std::endl;
+		std::cout << "CGI\t\t" << i->second.getCgi().first << "|" << i->second.getCgi().second << std::endl;
 		std::cout << "INDEX\t" << i->second.getIndex() << std::endl;
 		std::cout << "AUTOI\t" << i->second.getAutoIndex() << std::endl;
 		std::cout << "LIMIT\t" << i->second.getLimit() << std::endl;
@@ -44,7 +44,7 @@ void initServer(t_server &t) {
 
 void	initLocation(Location &l) {
 	l.root = "";
-	l.pathCgi = "";
+	l.cgi = std::pair<std::string, std::string>();
 	l.index = "";
 	l.autoindex = "off";
 	l.limit_client_body_size = 0;
@@ -128,9 +128,12 @@ void	getValueLocation(std::string & str, Location & loc) {
 		loc.root = value;
 	}
 	if (str.find("path_cgi:") != std::string::npos) {
+
 		std::string value = str.substr(str.find("path_cgi:") + strlen("path_cgi:"));
 		trimSpaces(value);
-		loc.pathCgi = value;
+		std::string extn = value.substr(0, value.find(' '));
+		std::string path = value.substr(value.find(extn) + extn.length());
+		loc.cgi = std::pair<std::string, std::string>(extn, path);
 	}
 	if (str.find("allow_methods:") != std::string::npos) {
 		str.erase(0, str.find(' ') + 1);
