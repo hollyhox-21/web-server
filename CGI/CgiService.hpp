@@ -7,7 +7,8 @@
 # include <string.h>
 # include "../Network/WServer.hpp"
 # include "../Network/Models/Request.hpp"
-
+# define IN 0
+# define OUT 1
 class CgiService
 {
 	public:
