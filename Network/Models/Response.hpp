@@ -21,10 +21,6 @@
 class Response
 {
 private:
-//	std::string		_version;
-//	int				_statusCode;
-//	char			*_time;
-//	std::string		_name;
 	unsigned long _fileLength;
 	char *_fileSrc;
 	Request &_request;
@@ -36,9 +32,12 @@ private:
 	void responseOnPut();
 	void fileNotFound(std::string root);
 	void methodnotallowed(std::string root);
-	std::string makeHeader(std::string &uri, std::string &src, std::string code);
-	std::string getdate();
+	int findLocation(std::map<std::string, Location>::iterator *it);
+	void createSrc(std::map<std::string, Location>::iterator it, const std::string&);
+	std::string makeHeader(std::string &uri, std::string &src, const std::string& code);
+	static std::string getdate();
 	void	generateResponse(std::string uri, std::map<std::string, Location>::iterator it);
+	void	genetateResponseAutoIn(DIR *dir, struct dirent *ent, std::string src, std::ifstream &file, std::string path);
 public:
 	Response(Request &request, std::map<int, std::string> &errorPage, std::map<std::string, Location> &locations);
 	~Response();
