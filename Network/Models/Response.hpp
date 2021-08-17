@@ -33,12 +33,14 @@ private:
 	void methodnotallowed(std::string root);
 	int findLocation(std::map<std::string, Location>::iterator *it);
 	void createSrc(std::map<std::string, Location>::iterator it, const std::string&);
-	std::string makeHeader(std::string &uri, std::string &src, const std::string& code);
+	void createCgiResponse(std::string &uri);
+	void createResponseWOCgi(std::string &uri);
+	std::string makeHeader(std::string &uri, std::string &src, const std::string& code, const std::string& type);
 	static std::string getdate();
 	void	generateResponse(std::string uri, std::map<std::string, Location>::iterator it);
 	void	genetateResponseAutoIn(DIR *dir, struct dirent *ent, std::string src, std::ifstream &file, std::string path);
 public:
-	Response(Request &request, t_server & serverSettings);
+	Response(Request &request, t_server &serverSettings);
 	~Response();
 	std::pair<char *, int> toFront();
 };
