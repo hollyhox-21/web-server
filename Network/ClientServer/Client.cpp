@@ -61,6 +61,7 @@ int		Client::recvMsg() {
 				nDataLength = recv(getSocket(), bufferBody, contentLenght, 0);
 				body.append(bufferBody, nDataLength);
 			}
+			int lenasf = body.length();
 			if ((int)body.length() == atoi(_req.getValueMapHeader("Content-Length").c_str())){
 				_req.parsBody(body);
 			}
