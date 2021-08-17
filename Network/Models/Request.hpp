@@ -25,7 +25,10 @@ private:
 	std::string                         _body;
 	std::string							_header;
 	std::map<std::string, std::string>  _mapHeaders;
-	
+public:
+
+private:
+
 	size_t	_findNth(const std::string & str , unsigned int N, const std::string & find);
 	bool	_checkEndHeaders(std::string & buffer);
 	bool	_checkContentLength();
