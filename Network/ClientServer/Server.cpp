@@ -77,7 +77,7 @@ void Server::disconnectEvent(Client & connection, int index) {
 }
 void Server::sendEvent(Client & connection) {
 	std::cout << "Msg: " << connection.getSocket() << std::endl;
-	connection.setResponse(_errorPages, _locations);
+	connection.setResponse(getSettings());
 	int ret = connection.sendMsg();
 	connection.changeStage();
 	if (ret == 0) {

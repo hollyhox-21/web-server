@@ -6,7 +6,7 @@
 # include <cstring>
 # include <sys/types.h>
 # include <sys/socket.h>
-# include "../Models/Request.hpp"
+# include "../Network.hpp"
 # include "../Models/Response.hpp"
 
 # define BUFFER_SIZE 256
@@ -18,6 +18,7 @@ class Client {
 		std::string		_message;
 		Request			_req;
 		Response		*_res;
+
 
 		void			recvChunked();
 	public:
@@ -32,7 +33,7 @@ class Client {
 		int				getSocket();
 		bool			getStage();
 		Request&		getRequest() { return _req; }
-		void			setResponse(std::map<int, std::string> & errPage, std::map<std::string, Location> & locations);
+		void			setResponse(t_server &serverSettings);
 };
 
 #endif
