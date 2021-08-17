@@ -7,7 +7,7 @@ Response::~Response()
 	delete[] _fileSrc;
 }
 
-Response::Response(Request &request, std::map<int, std::string> &errorPage, std::map<std::string, Location> &locations) : _fileLength(0), _fileSrc(nullptr), _request(request), _errorPage(errorPage), _locations(locations)
+Response::Response(Request &request, t_server &serverSettings): _request(request), _serverSettings(serverSettings)
 {
 	if (request.getMethod().find("GET", 0, 3) != std::string::npos)
 		responseOnGet();
@@ -19,13 +19,14 @@ Response::Response(Request &request, std::map<int, std::string> &errorPage, std:
 		responseOnPut();
 }
 
+
 int Response::findLocation(std::map<std::string, Location>::iterator *it)
 {
 	std::string uri = _request.getUri();
 	bool f = true;
 	while (!uri.empty() && f)
 	{
-		for (*it = _locations.begin(); *it != _locations.end(); ++(*it))
+		for (*it = _serverSettings.locations.begin(); *it != _serverSettings.locations.end(); ++(*it))
 			if ((*it)->first.find(uri) != std::string::npos)
 				return 0;
 		if (f && uri != "/" && !uri.empty())
@@ -83,6 +84,57 @@ void Response::responseOnGet()
 	}
 }
 
+
+void parseCgiResponse(std::string *a, std::string &header, std::string &body,
+					  std::string &code, std::string &type)
+{
+	int pos;
+	if ((pos = a->find("\r\n\r\n", 0)) != std::string::npos)
+	{
+		header = std::string(*a, 0, pos + 4);
+		body = std::string(*a, pos + 4);
+		if (header.find("Status: ", 0) != std::string::npos)
+			code = a->substr(8, 3);
+		if ((pos = a->find("Content-Type: ", 0)) != std::string::npos)
+			type = a->substr(pos + 14, 24);
+	}
+}
+
+void Response::createCgiResponse(std::string &uri)
+{
+	std::string *a = CgiService::getCgiResponse(_request, _serverSettings);
+	_fileLength = atoi(_request.getValueMapHeader("Content-Length").c_str());
+	std::cout << "\n\nPOST CGI:\n\n" << *a;
+	std::string code, type, header, body;
+	parseCgiResponse(a, header, body, code, type);
+	_fileLength = body.length();
+	body = makeHeader(uri, body, code, type);
+	_fileSrc = new char[_fileLength];
+	_fileLength = body.length();
+	for (unsigned long i = 0; i < _fileLength; ++i)
+		_fileSrc[i] = body[i];
+	_fileSrc[_fileLength] = 0;
+}
+
+void Response::createResponseWOCgi(std::string &uri)
+{
+	int fd = open(uri.c_str(), O_CREAT | O_WRONLY | O_TRUNC, S_IRUSR | S_IWUSR);
+	std::string src;
+	int contLength = atoi(
+			_request.getValueMapHeader("Content-Length").c_str());
+	src += _request.getBody();
+	_fileLength = src.length();
+	src = makeHeader(uri, src, "200 OK", "");
+	_fileLength = src.length();
+	_fileSrc = new char[_fileLength];
+	for (unsigned long i = 0; i < _fileLength; ++i)
+		_fileSrc[i] = src[i];
+	_fileSrc[_fileLength] = 0;
+	write(fd, _fileSrc + (_fileLength - contLength), _request.getBody().length());
+	close(fd);
+
+}
+
 void Response::responseOnPost()
 {
 	std::map<std::string, Location>::iterator it;
@@ -97,70 +149,19 @@ void Response::responseOnPost()
 		uri += "/";
 	uri += _request.getUri().substr(it->first.length());
 	struct stat buf;
-	if (::stat(uri.c_str(), &buf) != 0)
-	{
+	::stat(uri.c_str(), &buf);
+	if (it->second.getCgi().first == ".bla" && !it->second.getCgi().second.empty())
+		createCgiResponse(uri);
+	else if (buf.st_mode & S_IFDIR)
 		fileNotFound(it->second.root);
-//		std::ofstream file(uri);
-//		if (file.fail())
-//			fileNotFound(it->second.root);
-//		else
-//		{
-//			std::string *a = CgiService::getCgiResponse(_request);
-//			std::cout << "\n\nPOST CGI:\n\n" << *a;
-//			// std::string body = _request.getBody();
-//			// file << body;
-//			// _fileLength = atoi(_request.getValueMapHeader(
-//			// 		"Content-Length").c_str());
-//			_fileSrc = new char[a->length()];
-//			// for (unsigned long i = 0; i < _fileLength; ++i)
-//			// 	_fileSrc[i] = body[i];
-//			strcpy(_fileSrc, a->c_str());
-//			file.close();
-//			return;
-//		}
-	}
-	if (buf.st_mode & S_IFREG)
-	{
-		if (uri.rfind(it->second.getCgi().first) != std::string::npos)
-		{
-			std::string *a = CgiService::getCgiResponse(_request);
-			std::cout << "\n\nPOST CGI:\n\n" << *a;
-			_fileSrc = new char[a->length()];
-			strcpy(_fileSrc, a->c_str());
-		}
-		else
-		{
-			int fd = open(uri.c_str(), O_RDWR);
-			std::cout << "\n\nPOST 2:\n\n";
-			char buff[1025];
-			std::string src;
-			int len;
-			while ((len = read(fd, buff, 1024)) > 0)
-			{
-				_fileLength += len;
-				std::string dst(buff, len);
-				src += dst;
-			}
-			int contLength = atoi(
-					_request.getValueMapHeader("Content-Length").c_str());
-			_fileLength += contLength;
-			src += _request.getBody();
-			src = makeHeader(uri, src, "200 OK");
-			_fileLength = src.length();
-			_fileSrc = new char[_fileLength];
-			for (unsigned long i = 0; i < _fileLength; ++i)
-				_fileSrc[i] = src[i];
-			_fileSrc[_fileLength] = 0;
-			write(fd, _fileSrc + (_fileLength - contLength), contLength);
-		}
-	} else if (buf.st_mode & S_IFDIR)
-		fileNotFound(it->second.root);
+	else
+		createResponseWOCgi(uri);
 }
 
 void Response::createSrc(std::map<std::string, Location>::iterator it, const std::string& code)
 {
 	std::string src;
-	src = makeHeader(it->second.root, src, code);
+	src = makeHeader(it->second.root, src, code, "");
 	_fileLength = src.length();
 	_fileSrc = new char[_fileLength + 1];
 	for (unsigned long i = 0; i < _fileLength; ++i)
@@ -189,7 +190,7 @@ void Response::responseOnDelete()
 	}
 	if (buf.st_mode & S_IFREG)
 	{
-		if (remove(uri.c_str()))
+		if (std::remove(uri.c_str()))
 		{
 			fileNotFound(it->second.root);
 			return;
@@ -206,7 +207,7 @@ void Response::responseOnDelete()
 					   "\t</body>\n"
 					   "</html>";
 	_fileLength = body.length();
-	std::string header = makeHeader(uri, body, "200 OK");
+	std::string header = makeHeader(uri, body, "200 OK", "");
 	_fileLength = header.length();
 	_fileSrc = new char[_fileLength + 1];
 	for (size_t i = 0; i < _fileLength; ++i)
@@ -264,7 +265,7 @@ std::pair<char *, int> Response::toFront()
 	return std::pair<char *, int>(_fileSrc, _fileLength);
 }
 
-std::string Response::makeHeader(std::string &uri, std::string &src, const std::string& code)
+std::string Response::makeHeader(std::string &uri, std::string &src, const std::string& code, const std::string& type)
 {
 	std::string header;
 	header += "HTTP/1.1 ";
@@ -274,7 +275,9 @@ std::string Response::makeHeader(std::string &uri, std::string &src, const std::
 	header += "Content-Length: ";
 	header += std::to_string(_fileLength);
 	header += "\r\n";
-	if (uri.rfind(".html") != std::string::npos)
+	if (!type.empty())
+		header += "Content-Type: " + type;
+	else if (uri.rfind(".html") != std::string::npos)
 		header += "Content-Type: text/html\r\n";
 	else if (uri.rfind(".png") != std::string::npos)
 		header += "Content-Type: image/png\r\n";
@@ -370,7 +373,7 @@ void Response::fileNotFound(std::string root)
 			src += dst;
 		}
 		_fileLength = src.length();
-		src = makeHeader(path, src, "404 Not Found");
+		src = makeHeader(path, src, "404 Not Found", "");
 		_fileLength = src.length();
 		_fileSrc = new char[_fileLength];
 		for (unsigned long i = 0; i < _fileLength; ++i)
@@ -397,7 +400,7 @@ void	Response::generateResponse(std::string uri, std::map<std::string, Location>
 			std::string dst(buff, len);
 			src += dst;
 		}
-		src = makeHeader(uri, src, "200 OK");
+		src = makeHeader(uri, src, "200 OK", "");
 		_fileLength = src.length();
 		_fileSrc = new char[_fileLength + 1];
 		for (unsigned long i = 0; i < _fileLength; ++i)
@@ -435,7 +438,7 @@ void Response::genetateResponseAutoIn(DIR *dir, struct dirent *ent, std::string 
 		src += one_line;
 	}
 	_fileLength = src.length();
-	src = makeHeader(path, src, "200 OK");
+	src = makeHeader(path, src, "200 OK", "");
 	_fileLength = src.length();
 	_fileSrc = new char[_fileLength + 1];
 	for (unsigned long i = 0; i < _fileLength; ++i)
@@ -468,7 +471,7 @@ void Response::methodnotallowed(std::string root)
 			src += dst;
 		}
 		_fileLength = src.length();
-		src = makeHeader(path, src, "405 Method Not Allowed");
+		src = makeHeader(path, src, "405 Method Not Allowed", "");
 		_fileLength = src.length();
 		_fileSrc = new char[_fileLength];
 		for (unsigned long i = 0; i < _fileLength; ++i)
