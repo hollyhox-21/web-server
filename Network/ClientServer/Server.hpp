@@ -6,18 +6,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <vector>
-#include "Client.hpp"
-#include "../Sockets/ServerSocket.hpp"
-#include "../Models/Location.hpp"
-#include "../Models/Request.hpp"
-
-typedef struct s_server {
-	std::string						name;
-	std::string						host;
-	int								port;
-	std::map<int, std::string>		errorPages;
-	std::map<std::string, Location>	locations;
-} t_server;
+#include "../Network.hpp"
 
 class Server : public IEventHandler{
 	private:
@@ -31,9 +20,11 @@ class Server : public IEventHandler{
 		fd_set							_readFds;
 		fd_set							_writeFds;
 		int								_fdMax;
+		t_server						_serverSettings;
 
 	public:
 		Server(t_server & server) {
+			_serverSettings = server;
 			_name = server.name;
 			_host = server.host;
 			_port = server.port;
@@ -53,6 +44,8 @@ class Server : public IEventHandler{
 		void setPort(int port) { _port = port; }
 		void setErrorPages(std::map<int, std::string> errorPages) { _errorPages = errorPages; }
 		void setLocations(std::map<std::string, Location> locations) { _locations = locations; }
+
+		t_server&	getSettings() { return _serverSettings; }
 
 		void connectEvent(Client & connection);
 		void disconnectEvent(Client & connection, int index);

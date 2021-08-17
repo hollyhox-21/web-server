@@ -22,7 +22,6 @@ struct Location
 	}
 	
 	std::string getRoot() { return root; }
-
 	const std::pair<std::string, std::string> &getCgi() { return cgi; }
 	std::string getIndex() { return index; }
 	std::string getAutoIndex() { return autoindex; }

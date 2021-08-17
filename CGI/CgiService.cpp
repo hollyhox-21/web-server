@@ -1,140 +1,134 @@
 # include "CgiService.hpp"
 
-char ** CgiService::getCgiEnv(Request & req) {
+char * setString(std::string & buffer) {
+	char *str = new char[buffer.length() + 1];
+	strcpy(str, buffer.c_str());
+	str[buffer.length()] = 0;
+	return str;
+}
+
+char ** CgiService::getCgiEnv(Request & req, t_server & serverSettings) {
 	char **env = new char*[19];
 	
 	std::string buffer;
 	buffer = "AUTH_TYPE=basic";
-	env[0] = new char[buffer.length() + 1];
-	strcpy(env[0], buffer.c_str()); //Security needed to execute php-cgi
-	env[0][buffer.length()] = 0;
+	env[0] = strdup(buffer.c_str());
+	buffer = "CONTENT_LENGTH=" + std::to_string((int)req.getBody().length());
+	env[1] = strdup(buffer.c_str());
+	buffer = "CONTENT_TYPE=text/html";// + req.getValueMapHeader("Content-Type");
+	env[2] = strdup(buffer.c_str());
 	buffer = "GATEWAY_INTERFACE=CGI/1.1";
-	env[1] = new char[buffer.length() + 1];
-	strcpy(env[1], buffer.c_str());
-	env[1][buffer.length()] = 0;
-	buffer = "SCRIPT_NAME=";
-	buffer += "/home/zera/web-server/CGI/ubuntu_cgi_tester";
-	env[2] = new char[buffer.length() + 1];
-	strcpy(env[2], buffer.c_str());
-	env[2][buffer.length()] = 0;
-	buffer = "SCRIPT_NAME=";
-	buffer += "/home/zera/web-server/CGI/ubuntu_cgi_tester";
-	env[3] = new char[buffer.length() + 1];
-	strcpy(env[3], buffer.c_str());
-	env[3][buffer.length()] = 0;
-	buffer = "REQUEST_METHOD=" + req.getMethod();
-	env[4] = new char[buffer.length() + 1];
-	strcpy(env[4], buffer.c_str());
-	env[4][buffer.length()] = 0;
-	buffer = "CONTENT_LENGTH=" + std::to_string(req.getBody().length());
-	env[5] = new char[buffer.length() + 1];
-	strcpy(env[5], buffer.c_str());
-	env[5][buffer.length()] = 0;
-	buffer = "CONTENT_TYPE=" + req.getValueMapHeader("Content-Type");
-	env[6] = new char[buffer.length() + 1];
-	strcpy(env[6], buffer.c_str());
-	env[6][buffer.length()] = 0;
-	buffer = "PATH_INFO=";
-	buffer += "/home/zera/web-server/CGI/ubuntu_cgi_tester"; //might need some change, using config path/contentLocation
-	env[7] = new char[buffer.length() + 1];
-	strcpy(env[7], buffer.c_str());
-	env[7][buffer.length()] = 0;
-	buffer = "PATH_TRANSLATED=";
-	buffer += "/home/zera/web-server/CGI/ubuntu_cgi_tester"; //might need some change, using config path/contentLocation
-	env[8] = new char[buffer.length() + 1];
-	strcpy(env[8], buffer.c_str());
-	env[8][buffer.length()] = 0;
-	buffer = "QUERY_STRING=/home/zera/web-server/CGI/ubuntu_cgi_tester?1+2";
-	env[9] = new char[buffer.length() + 1];
-	strcpy(env[9], buffer.c_str());
-	env[9][buffer.length()] = 0;
-	buffer = "REMOTE_ADDR=";
-	buffer += "127.0.0.1";
-	env[10] = new char[buffer.length() + 1];
-	strcpy(env[10], buffer.c_str());
-	env[10][buffer.length()] = 0;
-	buffer = "REMOTE_IDENT=basic" + req.getValueMapHeader("Authorization");
-	env[11] = new char[buffer.length() + 1];
-	strcpy(env[11], buffer.c_str());
-	env[11][buffer.length()] = 0;
-	buffer = "REMOTE_USER=basic" + req.getValueMapHeader("Authorization");
-	env[12] = new char[buffer.length() + 1];
-	strcpy(env[12], buffer.c_str());
-	env[12][buffer.length()] = 0;
-	buffer = "REQUEST_URI=";
-	buffer += req.getMethod() + " " + req.getUri() + " " + req.getProto();
-	env[13] = new char[buffer.length() + 1];
-	strcpy(env[13], buffer.c_str());
-	env[13][buffer.length()] = 0;
-	// if (headers.find("Hostname") != headers.end())
-	// 	this->_env["SERVER_NAME"] = req.getValueMapHeader("Hostname");
-	// else
-	// 	this->_env["SERVER_NAME"] = this->_env["REMOTEaddr"];
-	buffer = "SERVER_PORT=";
-	buffer += std::to_string(8000);
-	env[14] = new char[buffer.length() + 1];
-	strcpy(env[14], buffer.c_str());
-	env[14][buffer.length()] = 0;
-	buffer = "SERVER_PROTOCOL=";
-	buffer += "HTTP/1.1";
-	env[15] = new char[buffer.length() + 1];
-	strcpy(env[15], buffer.c_str());
-	env[15][buffer.length()] = 0;
-	buffer = "SERVER_SOFTWARE=";
-	buffer += "Weebserv/1.0";
-	env[16] = new char[buffer.length() + 1];
-	strcpy(env[16], buffer.c_str());
-	env[16][buffer.length()] = 0;
+	env[3] = strdup(buffer.c_str());
+	buffer = "PATH_INFO=" + req.getUri() + "/";
+	env[5] = strdup(buffer.c_str());
+	buffer = "PATH_TRANSLATED=" + req.getUri() + "/";
+	env[6] = strdup(buffer.c_str());
+	buffer = "QUERY_STRING=" + req.getUri() + "/?";
+	env[7] = strdup(buffer.c_str());
+	buffer = "REMOTE_ADDR=" + serverSettings.host + "";
+	env[8] = strdup(buffer.c_str());
+	buffer = "REMOTE_IDENT=basic";
+	env[9] = strdup(buffer.c_str());
+	buffer = "REMOTE_USER=basic";
+	env[10] = strdup(buffer.c_str());
+	buffer = "REQUEST_METHOD=" + req.getMethod() + "";
+	env[11] = strdup(buffer.c_str());
+	buffer = "REQUEST_URI=" + req.getUri() + "/";
+	env[12] = strdup(buffer.c_str());
+	buffer = "SCRIPT_NAME=" + req.getUri() + "/";
+	env[13] = strdup(buffer.c_str());
+	buffer = "SERVER_NAME=" + serverSettings.name + "";
+	env[14] = strdup(buffer.c_str());
+	buffer = "SERVER_PORT=" + std::to_string(serverSettings.port) + "";
+	env[15] = strdup(buffer.c_str());
+	buffer = "SERVER_PROTOCOL=HTTP/1.1";
+	env[16] = strdup(buffer.c_str());
+	buffer = "SERVER_SOFTWARE=SVJ/228";
+	env[17] = strdup(buffer.c_str());
 	buffer = "HTTP_X_SECRET_HEADER_FOR_TEST=1";
-	env[17] = new char[buffer.length() + 1];
-	strcpy(env[17], buffer.c_str());
-	env[17][buffer.length()] = 0;
+	env[4] = strdup(buffer.c_str());
 	env[18] = NULL;
 	return env;
 }
 
 
-std::string * CgiService::getCgiResponse(Request & req) {
-	std::cout << "Start CGI" << std::endl;
-	std::string pathCgi = "/home/zera/web-server/CGI/ubuntu_cgi_tester";
-	std::string *bufferStr = new std::string();
-	char		buffer[1024] = {0};
-	pid_t		pid;
-	int			pipeFd[2];
-	char * const * nll = NULL;
-	char ** env = getCgiEnv(req);
-	
-	int i = -1;
+std::string * CgiService::getCgiResponse(Request & req, t_server & serverSettings) {
+	std::cout << "\nStart CGI" << std::endl;
+	std::string pathCgi = "/Users/hapryl/Desktop/Projects/web-server/CGI/cgi_tester";
 
+	char ** env = getCgiEnv(req, serverSettings);
+	int i = -1;
 	while (env[++i] != NULL)
 		std::cout << env[i] << std::endl;
-	pipe(pipeFd);
-	if ((pid = fork()) == 0) {
-		dup2(pipeFd[1], 1);
-		close(pipeFd[0]);
-		exit(execve(pathCgi.c_str(), nll, env));
+	//------------------------
+
+
+	int savedFd[2];
+	FILE *file[2];
+	int fd[2];
+	pid_t pid;
+	std::string *newBody = new std::string();
+
+
+	if ((savedFd[IN] = dup(STDIN_FILENO)) == -1 || (savedFd[OUT] = dup(STDOUT_FILENO)) == -1)
+		throw std::runtime_error(std::string("Can't create file descriptor"));;
+	if (!(file[IN] = tmpfile()) || !(file[OUT] = tmpfile()))
+		throw std::runtime_error(std::string("Can't create temporary file"));
+	if ((fd[IN] = fileno(file[IN])) == -1 || (fd[OUT] = fileno(file[OUT])) == -1)
+		throw std::runtime_error(std::string("Can't create file descriptor"));
+
+	write(fd[IN], req.getBody().c_str(), req.getBody().size());
+	lseek(fd[IN], SEEK_SET, SEEK_SET);
+
+	pid = fork();
+	if (pid == -1) {
+		throw std::runtime_error(std::string("Can't fork process"));
 	}
-	else if (pid == -1) {
-		std::cout << "Fork broken" << std::endl;
+	else if (pid == 0) {
+		dup2(fd[IN], STDIN_FILENO);
+		dup2(fd[OUT], STDOUT_FILENO);
+		char * const * nlPointer = NULL;
+		if (execve(pathCgi.c_str(), nlPointer, env) == -1)
+			throw std::runtime_error(std::string("Execve crashed!"));
+		write(STDOUT_FILENO, "Status: 500\r\n\r\n", 15);
 	}
-	else {
-		close(pipeFd[1]);
-		int status;
-		// lseek(pipeFd[0], 0, SEEK_SET);
-		int ret = 1;
-		while (ret > 0)
-		{
-			memset(buffer, 0, 1024);
-			ret = read(pipeFd[0], buffer, 1024 - 1);
-			*bufferStr += buffer;
-			printf("Buffer: %s \n", buffer);
+	else
+	{
+		char buffer[1024];
+		waitpid(-1, NULL, 0);
+		lseek(fd[OUT], SEEK_SET, SEEK_SET);
+		ssize_t bytes = 1;
+		while (bytes > 0) {
+			bzero(buffer, 1024);
+			bytes = read(fd[OUT], buffer, 1024);
+			*newBody += buffer;
 		}
-		waitpid(pid, &status, 0);
-		std::cout << status;
-		close(pipeFd[0]);
 	}
-	std::cout << *bufferStr;
+	dup2(savedFd[IN], STDIN_FILENO);
+	dup2(savedFd[OUT], STDOUT_FILENO);
+	fclose(file[IN]);
+	fclose(file[OUT]);
+	close(fd[IN]);
+	close(fd[OUT]);
+	close(savedFd[IN]);
+	close(savedFd[OUT]);
 	if (pid == 0)
 		exit(0);
-	return bufferStr;
+	size_t pos;
+	std::string cgiHeader;
+	// if ((pos = newBody.find("\r\n\r\n", 0)) != std::string::npos) {
+	// 	cgiHeader = std::string(newBody, 0, pos + 4);
+	// 	newBody = std::string(newBody, pos + 4);
+	// 	if (cgiHeader.find("Status: ", 0) != std::string::npos)
+	// 		std::cout << "status code " << (std::atoi(cgiHeader.substr(8, 3).c_str()));
+	// 	if ((pos = cgiHeader.find("Content-Type: ", 0)) != std::string::npos)
+	// 		std::cout << "Content-Type " << (cgiHeader.substr(pos + 14, 24));
+	// 	std::cout << "Header " << (cgiHeader);
+	// 	std::cout << "Body " << newBody;
+	// 	//std::cout << "" << ((size_t)_bodySize - cgiHeader.size());
+	// }
+	while (env[++i] != NULL)
+		delete[] env[i];
+	delete[] env;
+	return newBody;
 }

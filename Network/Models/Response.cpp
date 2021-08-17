@@ -344,8 +344,8 @@ std::string Response::getdate()
 
 void Response::fileNotFound(std::string root)
 {
-	std::map<int, std::string>::iterator it = _errorPage.begin();
-	for (; it != _errorPage.end() && it->first != 404; ++it) {	}
+	std::map<int, std::string>::iterator it = _serverSettings.errorPages.begin();
+	for (; it != _serverSettings.errorPages.end() && it->first != 404; ++it) {	}
 	std::string path;
 	if (root.rfind('/') == (root.length() - 1))
 		root.erase(root.length() - 1);
@@ -445,8 +445,8 @@ void Response::genetateResponseAutoIn(DIR *dir, struct dirent *ent, std::string 
 
 void Response::methodnotallowed(std::string root)
 {
-	std::map<int, std::string>::iterator it = _errorPage.begin();
-	for (; it != _errorPage.end() && it->first != 405; ++it) {	}
+	std::map<int, std::string>::iterator it = _serverSettings.errorPages.begin();
+	for (; it != _serverSettings.errorPages.end() && it->first != 405; ++it) {	}
 	std::string path;
 	if (root.rfind('/') == (root.length() - 1))
 		root.erase(root.length() - 1);

@@ -128,7 +128,6 @@ void	getValueLocation(std::string & str, Location & loc) {
 		loc.root = value;
 	}
 	if (str.find("path_cgi:") != std::string::npos) {
-
 		std::string value = str.substr(str.find("path_cgi:") + strlen("path_cgi:"));
 		trimSpaces(value);
 		std::string extn = value.substr(0, value.find(' '));
