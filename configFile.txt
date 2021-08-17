@@ -1,5 +1,5 @@
 server:
-	server_name: testing
+	server_name: localhost
 	host: 127.0.0.1
 	error_page: 404=/www/html/404.html 405=/www/html/405.html
 	port: 8000
@@ -9,7 +9,7 @@ server:
 		autoindex: on
 		index: /www/html/index.html
 		allow_methods: POST DELETE
-		root: /Users/ptycho/Documents/42cursus/web_server
+		root: /Users/hapryl/Desktop/Projects/web-server/www/html
 		path_cgi: .py /bin/cgi
 
 	location: /data
@@ -23,7 +23,7 @@ server:
 server:
 	host: 127.0.0.1
 	port: 8321
-	server_name: localhost
+	server_name: test
 	error_page: 404=/error_page.html
 
 	location: /
