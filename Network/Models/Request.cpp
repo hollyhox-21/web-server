@@ -138,4 +138,3 @@ std::string Request::getValueMapHeader(std::string key) {
 	else
 		return _mapHeaders[key];
 }
-
