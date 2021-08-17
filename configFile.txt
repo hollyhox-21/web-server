@@ -1,5 +1,5 @@
 server:
-	server_name: testing
+	server_name: localhost
 	host: 127.0.0.1
 	error_page: 404=/www/html/404.html 405=/www/html/405.html
 	port: 8000
@@ -23,7 +23,7 @@ server:
 server:
 	host: 127.0.0.1
 	port: 8321
-	server_name: localhost
+	server_name: test
 	error_page: 404=/error_page.html
 
 	location: /
