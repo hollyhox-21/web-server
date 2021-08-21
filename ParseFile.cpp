@@ -7,10 +7,11 @@ void	printLocations(std::map<std::string, Location> locations) {
 		std::cout << "\n";
 		std::cout << "Location: " << i->first << std::endl;
 		std::cout << "ROOT\t" << i->second.getRoot() << std::endl;
-		std::cout << "CGI\t\t" << i->second.getCgi().first << "|" << i->second.getCgi().second << std::endl;
+		std::cout << "CGI\t\t" << i->second.getCgi().first << "<=>" << i->second.getCgi().second << std::endl;
 		std::cout << "INDEX\t" << i->second.getIndex() << std::endl;
 		std::cout << "AUTOI\t" << i->second.getAutoIndex() << std::endl;
 		std::cout << "LIMIT\t" << i->second.getLimit() << std::endl;
+		std::cout << "RETURN\t" << i->second.getRedire().first << "<=>" << i->second.getRedire().second << std::endl;
 		std::map<std::string, bool> tmpMap = i->second.methods;
 		for (auto j = tmpMap.begin(); j != tmpMap.end() ; ++j) {
 			std::cout << "\t\t" << j->first << " -> " << j->second << std::endl;
@@ -44,7 +45,8 @@ void initServer(t_server &t) {
 
 void	initLocation(Location &l) {
 	l.root = "";
-	l.cgi = std::pair<std::string, std::string>();
+	l.cgi = std::pair<std::string, std::string>("", "");
+	l.redirect = std::pair<int, std::string>(0, "");
 	l.index = "";
 	l.autoindex = "off";
 	l.limit_client_body_size = 0;
@@ -141,11 +143,20 @@ void	getValueLocation(std::string & str, Location & loc) {
 		trimSpaces(value);
 		std::string extn = value.substr(0, value.find(' '));
 		std::string path = value.substr(value.find(extn) + extn.length());
+		trimSpaces(path);
 		loc.cgi = std::pair<std::string, std::string>(extn, path);
 	}
 	if (str.find("allow_methods:") != std::string::npos) {
 		str.erase(0, str.find(' ') + 1);
 		mapingMethods(loc.methods, str);
+	}
+	if (str.find("return:") != std::string::npos) {
+		std::string value = str.substr(str.find("return:") + strlen("return:"));
+		trimSpaces(value);
+		std::string extn = value.substr(0, value.find(' '));
+		std::string path = value.substr(value.find(extn) + extn.length());
+		trimSpaces(path);
+		loc.redirect = std::pair<int, std::string>(atoi(extn.c_str()), path);
 	}
 }
 
