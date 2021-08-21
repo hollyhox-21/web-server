@@ -15,6 +15,7 @@ server:
 	location: /data
 		limits_client_body_size: 1111
 		autoindex: off
+		return 301 http://localhost:8000/
 		index: /usr/index.html
 		allow_methods: POST DELETE
 		root: /Users/ptycho/Documents/42cursus/web_server
@@ -48,6 +49,7 @@ server:
 
 	location: /directory
 		root:			/Users/ptycho/Documents/42cursus/web_server/www/YoupiBanane
+		autoindex: on
 		index:			youpi.bad_extension
 		allow_methods: GET HEAD POST
 		path_cgi:		.bla /Users/ptycho/Documents/42cursus/web_server/CGI/cgi_tester

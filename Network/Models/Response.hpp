@@ -33,6 +33,9 @@ private:
 	void deleteMultiSl(std::string &uri);
 	void fileNotFound(std::string root);
 	void methodnotallowed(std::string root);
+	void errorFileExist();
+	void errorFileNotExist(std::string &path);
+	void generateAutoIndex(std::string &uri, std::map<std::string, Location>::iterator &it);
 	int findLocation(std::map<std::string, Location>::iterator *it);
 	void createSrc(std::map<std::string, Location>::iterator it, const std::string&);
 	void createCgiResponse(std::string &uri);
