@@ -13,25 +13,30 @@ void	Client::recvChunked() {
 	int				nDataLength;
 	long			contentLenght = 0;
 	char			*p;
-	char			buffer[BUFFER_SIZE];
+	char			buffer[BUFFER_SIZE + 1];
 	std::string		bufferLenght;
 	std::string		body;
-	const char		*konec;
-
+	std::string     bufferIzlishek;
+	char		    *konec;
 
 	do {
 		do {
 			nDataLength = recv(getSocket(), buffer, BUFFER_SIZE, 0);
-			bufferLenght.append(buffer);
-		} while ((konec = strstr(bufferLenght.c_str(), (const char*)"\r\n")) == NULL);
+			if (nDataLength > 0) {
+			    buffer[nDataLength] = 0;
+			    bufferLenght.append(buffer, nDataLength);
+			}
+		} while ((konec = (char*)strstr(bufferLenght.c_str(), (const char*)"\r\n")) == NULL);
+		std::cout << "\"" << bufferLenght << "\"" << std::endl;
 		konec += 2;
+		bufferIzlishek = konec;
 		bufferLenght = bufferLenght.substr(0, konec - bufferLenght.c_str());
 		std::cout << "Len:" << bufferLenght << std::endl;
 		contentLenght = strtol(bufferLenght.c_str(), & p, 16) + 2;
-		char	bufferBody[contentLenght - strlen(konec)];
-		body.append(konec);
-		if (contentLenght - strlen(konec) > 0) {
-		    nDataLength = recv(getSocket(), bufferBody, contentLenght - strlen(konec), 0);
+		char	bufferBody[contentLenght - bufferIzlishek.length()];
+		body.append(bufferIzlishek);
+		if (contentLenght - bufferIzlishek.length() > 0) {
+		    nDataLength = recv(getSocket(), bufferBody, contentLenght - bufferIzlishek.length(), 0);
 		    body.append(bufferBody);
 		}
 		bufferLenght = "";
@@ -55,8 +60,6 @@ int		Client::recvMsg() {
 		_message = _message.substr(0, konec + 4 - _message.c_str());
 		std::cout << _message;
 		_req.parsRequest(_message);
-		if (_req.getMethod() == "HEAD")
-		    std::cout << "";
 		if (_req.getMethod() != "GET" && _req.getMethod() != "HEAD") {
 			if (_req.getValueMapHeader("Transfer-Encoding") == "chunked") {
 				recvChunked();
@@ -66,7 +69,7 @@ int		Client::recvMsg() {
 				return -1;
 			else if ((int)body.length() < atoi(_req.getValueMapHeader("Content-Length").c_str())){
 				std::cout << "begining" << std::endl;
-				int		contentLenght = atoi(_req.getValueMapHeader(std::string("Content-Length")).c_str());
+				int		contentLenght = atoi(_req.getValueMapHeader(std::string("Content-Length")).c_str()) + 2;
 				char	bufferBody[contentLenght];
 				nDataLength = recv(getSocket(), bufferBody, contentLenght, 0);
 				body.append(bufferBody, nDataLength);
