@@ -24,15 +24,17 @@ void	Client::recvChunked() {
 			nDataLength = recv(getSocket(), buffer, BUFFER_SIZE, 0);
 			bufferLenght.append(buffer);
 		} while ((konec = strstr(bufferLenght.c_str(), (const char*)"\r\n")) == NULL);
-		bufferLenght = bufferLenght.substr(0, konec - bufferLenght.c_str() + 2);
+		konec += 2;
+		bufferLenght = bufferLenght.substr(0, konec - bufferLenght.c_str());
 		std::cout << "Len:" << bufferLenght << std::endl;
 		contentLenght = strtol(bufferLenght.c_str(), & p, 16) + 2;
-		char	bufferBody[contentLenght- strlen(konec)];
+		char	bufferBody[contentLenght - strlen(konec)];
 		body.append(konec);
 		if (contentLenght - strlen(konec) > 0) {
 		    nDataLength = recv(getSocket(), bufferBody, contentLenght - strlen(konec), 0);
 		    body.append(bufferBody);
 		}
+		bufferLenght = "";
 	} while (contentLenght > 2);
 	std::cout << "Body: " << body << std::endl;
 	_req.parsBody(body);
@@ -53,7 +55,7 @@ int		Client::recvMsg() {
 		_message = _message.substr(0, konec + 4 - _message.c_str());
 		std::cout << _message;
 		_req.parsRequest(_message);
-		if (_req.getMethod() == "PUT")
+		if (_req.getMethod() == "HEAD")
 		    std::cout << "";
 		if (_req.getMethod() != "GET" && _req.getMethod() != "HEAD") {
 			if (_req.getValueMapHeader("Transfer-Encoding") == "chunked") {

@@ -10,17 +10,16 @@ server:
 		index: /www/html/index.html
 		allow_methods: POST DELETE GET PUT
 		root: /Users/ptycho/Documents/42cursus/web_server
-		path_cgi: .bla /Users/flavon/Desktop/webserv/test/cgi_tester
-		return: 301 blablabla
+		path_cgi: .bla /Users/ptycho/Documents/42cursus/web_server/CGI/cgi_tester
 
 	location: /data
 		limits_client_body_size: 1111
-		autoindex: off
-		index: /usr/index.html
-		allow_methods: POST DELETE
+		autoindex: on
+		return: 301 http://localhost:8000/Network/html/ass.jpg
+		index: /www/html/index.html
+		allow_methods: POST DELETE GET PUT
 		root: /Users/ptycho/Documents/42cursus/web_server
-		path_cgi: /bin/cgi/test
-		return: 100500 blablabla
+		path_cgi: .bla /Users/ptycho/Documents/42cursus/web_server/CGI/cgi_tester
 
 server:
 	host: 127.0.0.1

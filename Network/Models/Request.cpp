@@ -137,3 +137,8 @@ std::string Request::getValueMapHeader(std::string key) {
         return "";
     return _mapHeaders.at(key);
 }
+
+void Request::setUri(const std::string &uri)
+{
+	_uri = uri;
+}

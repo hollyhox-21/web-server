@@ -33,6 +33,11 @@ private:
 	bool	_checkEndHeaders(std::string & buffer);
 	bool	_checkContentLength();
 	void	_parsHeaders(std::string & buffer);
+
+public:
+	void setUri(const std::string &uri);
+
+private:
 	void	_parsFirstHeader(const std::string& buffer);
 	void	_mapingHeaders(std::string & buffer);
 	std::string _Key(std::string& buffer);
