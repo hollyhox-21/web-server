@@ -5,6 +5,7 @@
 #include <iostream>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <fcntl.h>
 #include <sys/socket.h>
 #include "../Exceptions/ServerExceptions.hpp"
 
