@@ -1,5 +1,5 @@
 server:
-	server_name: localhost
+	server_name: test
 	host: 127.0.0.1
 	error_page: 404=/www/html/404.html 405=/www/html/405.html
 	port: 8000
@@ -11,6 +11,7 @@ server:
 		allow_methods: POST DELETE GET PUT
 		root: /Users/ptycho/Documents/42cursus/web_server
 		path_cgi: .bla /Users/flavon/Desktop/webserv/test/cgi_tester
+		return: 301 blablabla
 
 	location: /data
 		limits_client_body_size: 1111
@@ -19,32 +20,36 @@ server:
 		allow_methods: POST DELETE
 		root: /Users/ptycho/Documents/42cursus/web_server
 		path_cgi: /bin/cgi/test
+		return: 100500 blablabla
 
 server:
 	host: 127.0.0.1
 	port: 8321
-	server_name: test
-	error_page: 404=/error_page.html
+	server_name: localhost
+	error_page: 404=/html/404.html 405=/html/405.html
 
 	location: /
 		limits_client_body_size: 2000
 		autoindex: on
-		index: /www/html/index.html
-		allow_methods: POST DELETE GET PUT
-		root: /Users/ptycho/Documents/42cursus/web_server
-		path_cgi: .bla /Users/flavon/Desktop/webserv/test/cgi_tester
+		index: /html/index.html
+		allow_methods: GET
+		root: /Users/ptycho/Documents/42cursus/web_server/www/
+		path_cgi: .bla /Users/ptycho/Documents/42cursus/web_server/CGI/cgi_tester
 
 	location: /put_test
-		root:			/Users/flavon/Desktop/webserv/files/
+		root:			/Users/ptycho/Documents/42cursus/web_server/www
+		allow_methods: PUT POST
+		path_cgi: .bla /Users/ptycho/Documents/42cursus/web_server/CGI/cgi_tester
+
 
 	location: /post_body
-		root:						/Users/flavon/Desktop/webserv/files/
+		root:						/Users/ptycho/Documents/42cursus/web_server/www
 		allow_methods:				POST
-		path_cgi:					.bla /Users/flavon/Desktop/webserv/test/cgi_tester
+		path_cgi:					.bla /Users/ptycho/Documents/42cursus/web_server/CGI/cgi_tester
 		limits_client_body_size:	100
 
 	location: /directory
-		root:			/Users/flavon/Desktop/webserv/test/YoupiBanane
+		root:			/Users/ptycho/Documents/42cursus/web_server/www/YoupiBanane
 		index:			youpi.bad_extension
-		allow_methods:	GET POST
-		path_cgi:		.bla /Users/flavon/Desktop/webserv/test/cgi_tester
+		allow_methods: GET HEAD POST
+		path_cgi:		.bla /Users/ptycho/Documents/42cursus/web_server/CGI/cgi_tester

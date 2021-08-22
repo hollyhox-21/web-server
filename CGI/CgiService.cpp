@@ -54,7 +54,7 @@ char ** CgiService::getCgiEnv(Request & req, t_server & serverSettings) {
 
 std::string * CgiService::getCgiResponse(Request & req, t_server & serverSettings) {
 	std::cout << "\nStart CGI" << std::endl;
-	std::string pathCgi = "/Users/hapryl/Desktop/Projects/web-server/CGI/cgi_tester";
+	std::string pathCgi = "/Users/ptycho/Documents/42cursus/web_server/CGI/cgi_tester";
 
 	char ** env = getCgiEnv(req, serverSettings);
 	int i = -1;

@@ -13,6 +13,7 @@ struct Location
 	std::string					index;
 	std::string					autoindex;
 	int							limit_client_body_size;
+	std::pair<int, std::string>	redirect;
 	void reset(){
 		methods = std::map<std::string, bool>();
 		root = std::string();
@@ -27,6 +28,7 @@ struct Location
 	std::string getAutoIndex() { return autoindex; }
 	int			getLimit() { return limit_client_body_size; }
 	std::map<std::string, bool> getMethods() { return methods; }
+	const std::pair<int, std::string> &getRedire() { return redirect; }
 };
 
 #endif
