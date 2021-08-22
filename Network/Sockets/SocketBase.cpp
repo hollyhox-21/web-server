@@ -22,6 +22,13 @@ int SocketBase::getSocket() {
 
 void SocketBase::setSocket(int socket) {
 	int yes = 1;
+	int flags;
+
+	if ((flags = fcntl(socket, F_GETFL, 0)) < 0)
+	    throw SocketException("Error F_GETFL");
+	flags |= O_NONBLOCK;
+	if (fcntl(socket, F_SETFL, flags) < 0)
+	    throw SocketException("Error F_SETFL");
 	if ((_socket = socket) < 0 || setsockopt(socket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) < 0)
 		throw SocketException("Socket didn't created");
 }

@@ -133,8 +133,7 @@ std::string Request::getUri() const { return _uri; }
 std::string Request::getProto() const { return _proto; }
 std::string Request::getBody() const { return _body; }
 std::string Request::getValueMapHeader(std::string key) {
-	if ( _mapHeaders.find("Content-Length") == _mapHeaders.end() )
-		return "";
-	else
-		return _mapHeaders[key];
+    if (_mapHeaders.find(key) == _mapHeaders.end())
+        return "";
+    return _mapHeaders.at(key);
 }
