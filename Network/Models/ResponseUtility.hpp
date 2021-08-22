@@ -1,0 +1,4 @@
+#ifndef RESPONSEUTILITY_HPP
+# define RESPONSEUTILITY_HPP
+
+#endif
