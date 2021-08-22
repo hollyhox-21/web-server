@@ -53,6 +53,8 @@ void	initLocation(Location &l) {
 	l.methods["GET"] = true;
 	l.methods["POST"] = true;
 	l.methods["DELETE"] = true;
+	l.methods["PUT"] = true;
+	l.methods["HEAD"] = true;
 }
 
 //============UTILS==============
@@ -101,6 +103,13 @@ void	mapingMethods(std::map<std::string, bool> &methods, std::string &str) {
 	if (str.find("DELETE") == std::string::npos) {
 		methods["DELETE"] = false;
 	}
+	if (str.find("PUT") == std::string::npos) {
+		methods["PUT"] = false;
+	}
+	if (str.find("HEAD") == std::string::npos) {
+		methods["HEAD"] = false;
+	}
+
 }
 
 void	getValueLocation(std::string & str, Location & loc) {

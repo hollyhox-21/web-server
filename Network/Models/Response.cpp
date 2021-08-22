@@ -4,10 +4,10 @@
 
 Response::~Response()
 {
-	delete[] _fileSrc;
+	delete _fileSrc;
 }
 
-Response::Response(Request &request, t_server &serverSettings): _request(request), _serverSettings(serverSettings)
+Response::Response(Request &request, t_server &serverSettings): _request(request), _serverSettings(serverSettings), _fileLength(0), _fileSrc(nullptr)
 {
 	if (request.getMethod().find("GET", 0, 3) != std::string::npos)
 		responseOnGet();
@@ -17,12 +17,15 @@ Response::Response(Request &request, t_server &serverSettings): _request(request
 		responseOnDelete();
 	else if (request.getMethod().find("PUT", 0, 3) != std::string::npos)
 		responseOnPut();
+	else if (request.getMethod().find("HEAD", 0, 4) != std::string::npos)
+		responseOnHead();
 }
 
 
 int Response::findLocation(std::map<std::string, Location>::iterator *it)
 {
 	std::string uri = _request.getUri();
+	deleteMultiSl(uri);
 	bool f = true;
 	while (!uri.empty() && f)
 	{
@@ -39,6 +42,13 @@ int Response::findLocation(std::map<std::string, Location>::iterator *it)
 	return 1;
 }
 
+void Response::deleteMultiSl(std::string &uri)
+{
+	for (int i = 1; i < uri.length(); ++i)
+		if (uri[i] == '/' && uri[i - 1] == '/')
+			uri.erase(i,1);
+}
+
 void Response::responseOnGet()
 {
 	std::map<std::string, Location>::iterator it;
@@ -51,7 +61,9 @@ void Response::responseOnGet()
 	std::string uri = it->second.root;
 	if (_request.getUri().substr(it->first.length())[0] != '/')
 		uri += "/";
-	uri += _request.getUri().substr(it->first.length());
+	uri += _request.getUri().substr(_request.getUri().find(it->first) + it->first.length());
+//	uri += _request.getUri().substr(it->first.length());
+	deleteMultiSl(uri);
 	struct stat buf;
 	if (::stat(uri.c_str(), &buf) != 0)
 	{
@@ -69,7 +81,7 @@ void Response::responseOnGet()
 			std::string src;
 			if ((dir = opendir(uri.c_str())) != nullptr)
 			{
-				std::string path = it->second.root + "/www/html/autoindex.html";
+				std::string path = it->second.root + "/html/autoindex.html";
 				std::ifstream file(path);
 				if (file.fail())
 					fileNotFound(it->second.root);
@@ -80,7 +92,7 @@ void Response::responseOnGet()
 			}
 		}
 		else if (it->second.autoindex.find("off", 0, 2) != std::string::npos)
-			generateResponse(it->second.root + it->second.index, it);
+			generateResponse(uri + "/" + it->second.index, it);
 	}
 }
 
@@ -109,30 +121,29 @@ void Response::createCgiResponse(std::string &uri)
 	parseCgiResponse(a, header, body, code, type);
 	_fileLength = body.length();
 	body = makeHeader(uri, body, code, type);
-	_fileSrc = new char[_fileLength];
+	_fileSrc = new char[_fileLength + 1];
 	_fileLength = body.length();
 	for (unsigned long i = 0; i < _fileLength; ++i)
 		_fileSrc[i] = body[i];
 	_fileSrc[_fileLength] = 0;
 }
 
-void Response::createResponseWOCgi(std::string &uri)
+void Response::createResponseWOCgi(std::string &uri, std::string code)
 {
-	int fd = open(uri.c_str(), O_CREAT | O_WRONLY | O_TRUNC, S_IRUSR | S_IWUSR);
+	int fd = open(uri.c_str(), O_CREAT | O_WRONLY | O_TRUNC, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
 	std::string src;
 	int contLength = atoi(
 			_request.getValueMapHeader("Content-Length").c_str());
 	src += _request.getBody();
 	_fileLength = src.length();
-	src = makeHeader(uri, src, "200 OK", "");
+	src = makeHeader(uri, src, code, "");
 	_fileLength = src.length();
-	_fileSrc = new char[_fileLength];
+	_fileSrc = new char[_fileLength + 1];
 	for (unsigned long i = 0; i < _fileLength; ++i)
 		_fileSrc[i] = src[i];
 	_fileSrc[_fileLength] = 0;
 	write(fd, _fileSrc + (_fileLength - contLength), _request.getBody().length());
 	close(fd);
-
 }
 
 void Response::responseOnPost()
@@ -147,7 +158,9 @@ void Response::responseOnPost()
 	std::string uri = it->second.root;
 	if (_request.getUri().substr(it->first.length())[0] != '/')
 		uri += "/";
-	uri += _request.getUri().substr(it->first.length());
+	uri += _request.getUri().substr(_request.getUri().find(it->first) + it->first.length());
+//	uri += _request.getUri().substr(it->first.length());
+	deleteMultiSl(uri);
 	struct stat buf;
 	::stat(uri.c_str(), &buf);
 	if (it->second.getCgi().first == ".bla" && !it->second.getCgi().second.empty())
@@ -155,7 +168,7 @@ void Response::responseOnPost()
 	else if (buf.st_mode & S_IFDIR)
 		fileNotFound(it->second.root);
 	else
-		createResponseWOCgi(uri);
+		createResponseWOCgi(uri, "200 OK");
 }
 
 void Response::createSrc(std::map<std::string, Location>::iterator it, const std::string& code)
@@ -181,7 +194,9 @@ void Response::responseOnDelete()
 	std::string uri = it->second.root;
 	if (_request.getUri().substr(it->first.length())[0] != '/')
 		uri += "/";
-	uri += _request.getUri().substr(it->first.length());
+	uri += _request.getUri().substr(_request.getUri().find(it->first) + it->first.length());
+	//	uri += _request.getUri().substr(it->first.length());
+	deleteMultiSl(uri);
 	struct stat buf;
 	if (::stat(uri.c_str(), &buf) != 0)
 	{
@@ -219,7 +234,7 @@ void Response::responseOnPut()
 {
 	std::map<std::string, Location>::iterator it;
 	int cod = findLocation(&it);
-	if (cod || !it->second.methods["POST"])
+	if (cod || !it->second.methods["PUT"])
 	{
 		methodnotallowed(it->second.root);
 		return;
@@ -227,34 +242,27 @@ void Response::responseOnPut()
 	std::string uri = it->second.root;
 	if (_request.getUri().substr(it->first.length())[0] != '/')
 		uri += "/";
-	uri += _request.getUri().substr(it->first.length());
+	uri += _request.getUri().substr(_request.getUri().find(it->first) + it->first.length());
+	//	uri += _request.getUri().substr(it->first.length());
+	deleteMultiSl(uri);
 	struct stat buf;
 	if (::stat(uri.c_str(), &buf) != 0)
 	{
-		std::ofstream file(uri);
-		if (file.fail())
-			fileNotFound(it->second.root);
-		else
-		{
-			std::string body = _request.getBody();
-			file << body;
-			createSrc(it, "201 Created");
-			file.close();
-			return;
-		}
+		createResponseWOCgi(uri, "201 Created");
 	}
 	if (buf.st_mode & S_IFREG)
 	{
-		std::ofstream file(uri);
-		if (file.fail())
-			fileNotFound(it->second.root);
-		else
-		{
-			std::string body = _request.getBody();
-			file << body;
-			createSrc(it, "200 OK");
-			file.close();
-		}
+		createResponseWOCgi(uri, "200 OK");
+//		std::ofstream file(uri, std::ofstream::out);
+//		if (file.fail())
+//			fileNotFound(it->second.root);
+//		else
+//		{
+//			std::string body = _request.getBody();
+//			file << body;
+//			createSrc(it, "200 OK");
+//			file.close();
+//		}
 	}
 	else if (buf.st_mode & S_IFDIR)
 		fileNotFound(it->second.root);
@@ -328,9 +336,9 @@ std::string Response::getdate()
 	std::time_t t = std::time(nullptr);
 	std::tm *now = std::localtime(&t);
 	std::string date;
-	date += week[now->tm_wday];
+	date += week[now->tm_wday - 1];
 	date += ", ";
-	date += std::to_string(now->tm_mon);
+	date += std::to_string(now->tm_mday);
 	date += ' ';
 	date += month[now->tm_mon];
 	date += ' ';
@@ -358,8 +366,21 @@ void Response::fileNotFound(std::string root)
 	{
 		path = "./Network/html/404.html";
 		fd = open(path.c_str(), O_RDONLY);
-		if (fd < 0)
-			return;
+		char buff[1025];
+		std::string src;
+		long len;
+		while ((len = read(fd, buff, 1024)) > 0)
+		{
+			_fileLength += len;
+			std::string dst(buff, len);
+			src += dst;
+		}
+		src = makeHeader(path, src, "404 Not Found", "");
+		_fileLength = src.length();
+		_fileSrc = new char[_fileLength + 1];
+		for (unsigned long i = 0; i < _fileLength; ++i)
+			_fileSrc[i] = src[i];
+		_fileSrc[_fileLength] = 0;
 	}
 	else
 	{
@@ -372,10 +393,9 @@ void Response::fileNotFound(std::string root)
 			std::string dst(buff, len);
 			src += dst;
 		}
-		_fileLength = src.length();
 		src = makeHeader(path, src, "404 Not Found", "");
 		_fileLength = src.length();
-		_fileSrc = new char[_fileLength];
+		_fileSrc = new char[_fileLength + 1];
 		for (unsigned long i = 0; i < _fileLength; ++i)
 			_fileSrc[i] = src[i];
 		_fileSrc[_fileLength] = 0;
@@ -384,6 +404,7 @@ void Response::fileNotFound(std::string root)
 
 void	Response::generateResponse(std::string uri, std::map<std::string, Location>::iterator it)
 {
+	deleteMultiSl(uri);
 	int fd = open(uri.c_str(), O_RDONLY);
 	if (fd < 0)
 	{
@@ -406,6 +427,7 @@ void	Response::generateResponse(std::string uri, std::map<std::string, Location>
 		for (unsigned long i = 0; i < _fileLength; ++i)
 			_fileSrc[i] = src[i];
 		_fileSrc[_fileLength] = 0;
+		close(fd);
 	}
 }
 
@@ -470,12 +492,32 @@ void Response::methodnotallowed(std::string root)
 			std::string dst(buff, len);
 			src += dst;
 		}
-		_fileLength = src.length();
 		src = makeHeader(path, src, "405 Method Not Allowed", "");
 		_fileLength = src.length();
-		_fileSrc = new char[_fileLength];
+		_fileSrc = new char[_fileLength + 1];
 		for (unsigned long i = 0; i < _fileLength; ++i)
 			_fileSrc[i] = src[i];
 		_fileSrc[_fileLength] = 0;
 	}
+}
+
+void Response::responseOnHead()
+{
+	std::map<std::string, Location>::iterator it;
+	int cod = findLocation(&it);
+	if (cod || !it->second.methods["HEAD"])
+	{
+		methodnotallowed(it->second.root);
+		return;
+	}
+	responseOnGet();
+	std::string resp = std::string(_fileSrc, _fileLength);
+	unsigned long len = resp.find(CRLF_END) + 4;
+	char *oldResp = _fileSrc;
+	_fileSrc = new char[len + 1];
+	for (int i = 0; i < len; ++i)
+		_fileSrc[i] = oldResp[i];
+	_fileLength = len;
+	_fileSrc[len] = 0;
+	delete[] oldResp;
 }
