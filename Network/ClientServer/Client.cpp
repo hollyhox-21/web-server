@@ -24,13 +24,17 @@ void	Client::recvChunked() {
 			nDataLength = recv(getSocket(), buffer, BUFFER_SIZE, 0);
 			bufferLenght.append(buffer);
 		} while ((konec = strstr(bufferLenght.c_str(), (const char*)"\r\n")) == NULL);
-		bufferLenght = bufferLenght.substr(0, konec - bufferLenght.c_str());
-		contentLenght = strtol(bufferLenght.c_str(), & p, 16);
-		char	bufferBody[contentLenght + 2];
-		nDataLength = recv(getSocket(), bufferBody, contentLenght + 2, 0);
-		body.append(konec + 2);
-		body.append(bufferBody);
-	} while (contentLenght > 0);
+		bufferLenght = bufferLenght.substr(0, konec - bufferLenght.c_str() + 2);
+		std::cout << "Len:" << bufferLenght << std::endl;
+		contentLenght = strtol(bufferLenght.c_str(), & p, 16) + 2;
+		char	bufferBody[contentLenght- strlen(konec)];
+		body.append(konec);
+		if (contentLenght - strlen(konec) > 0) {
+		    nDataLength = recv(getSocket(), bufferBody, contentLenght - strlen(konec), 0);
+		    body.append(bufferBody);
+		}
+	} while (contentLenght > 2);
+	std::cout << "Body: " << body << std::endl;
 	_req.parsBody(body);
 }
 
@@ -47,7 +51,10 @@ int		Client::recvMsg() {
 	if ((konec = strstr(_message.c_str(), (const char*)"\r\n\r\n")) != NULL) {
 		std::string body = std::string(konec + 4);
 		_message = _message.substr(0, konec + 4 - _message.c_str());
+		std::cout << _message;
 		_req.parsRequest(_message);
+		if (_req.getMethod() == "PUT")
+		    std::cout << "";
 		if (_req.getMethod() != "GET" && _req.getMethod() != "HEAD") {
 			if (_req.getValueMapHeader("Transfer-Encoding") == "chunked") {
 				recvChunked();
