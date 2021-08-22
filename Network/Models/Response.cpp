@@ -152,7 +152,7 @@ int Response::responseOnHead()
 		cod = rediraction(&it);
 	if (cod == 1)
 		return returnErrors();
-	if (!it->second.methods["PUT"])
+	if (!it->second.methods["HEAD"])
 		return methodnotallowed(it->second.root);
 	responseOnGet();
 	std::string resp = std::string(_fileSrc, _fileLength);
