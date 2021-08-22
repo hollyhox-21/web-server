@@ -21,22 +21,19 @@ Response::Response(Request &request, t_server &serverSettings): _request(request
 		responseOnHead();
 }
 
-void Response::responseOnGet()
+int Response::responseOnGet()
 {
 	std::map<std::string, Location>::iterator it;
 	int cod = findLocation(&it);
-	if (cod || !it->second.methods["GET"])
-	{
-		methodnotallowed(it->second.root);
-		return;
-	}
-	std::string uri = it->second.root;
-	if (_request.getUri().substr(it->first.length())[0] != '/')
-		uri += "/";
-	uri += _request.getUri().substr(_request.getUri().find(it->first) + it->first.length());
-//	uri += _request.getUri().substr(it->first.length());
+	if (it->second.redirect.first == 301 && !it->second.redirect.second.empty())
+		cod = rediraction(&it);
+	if (cod == 1)
+		return returnErrors();
+	if (!it->second.methods["GET"])
+		return methodnotallowed(it->second.root);
+	std::string uri = it->second.root + "/";
+		uri += _request.getUri().substr(_request.getUri().find(it->first) + it->first.length());
 	deleteMultiSl(uri);
-
 	struct stat buf;
 	if (::stat(uri.c_str(), &buf) != 0)
 		fileNotFound(it->second.root);
@@ -49,17 +46,19 @@ void Response::responseOnGet()
 		else if (it->second.autoindex.find("off", 0, 2) != std::string::npos)
 			generateResponse(uri + "/" + it->second.index, it);
 	}
+	return 0;
 }
 
-void Response::responseOnPost()
+int Response::responseOnPost()
 {
 	std::map<std::string, Location>::iterator it;
 	int cod = findLocation(&it);
-	if (cod || !it->second.methods["POST"])
-	{
-		methodnotallowed(it->second.root);
-		return;
-	}
+	if (it->second.redirect.first == 301 && !it->second.redirect.second.empty())
+		cod = rediraction(&it);
+	if (cod == 1)
+		return returnErrors();
+	if (!it->second.methods["POST"])
+		return methodnotallowed(it->second.root);
 	std::string uri = it->second.root;
 	if (_request.getUri().substr(it->first.length())[0] != '/')
 		uri += "/";
@@ -74,17 +73,19 @@ void Response::responseOnPost()
 		fileNotFound(it->second.root);
 	else
 		createResponseWOCgi(uri, "200 OK");
+	return 0;
 }
 
-void Response::responseOnDelete()
+int Response::responseOnDelete()
 {
 	std::map<std::string, Location>::iterator it;
 	int cod = findLocation(&it);
-	if (cod || !it->second.methods["DELETE"])
-	{
-		methodnotallowed(it->second.root);
-		return;
-	}
+	if (it->second.redirect.first == 301 && !it->second.redirect.second.empty())
+		cod = rediraction(&it);
+	if (cod == 1)
+		return returnErrors();
+	if (!it->second.methods["DELETE"])
+		return methodnotallowed(it->second.root);
 	std::string uri = it->second.root;
 	if (_request.getUri().substr(it->first.length())[0] != '/')
 		uri += "/";
@@ -93,46 +94,40 @@ void Response::responseOnDelete()
 	deleteMultiSl(uri);
 	struct stat buf;
 	if (::stat(uri.c_str(), &buf) != 0)
-	{
 		fileNotFound(it->second.root);
-		return;
-	}
 	if (buf.st_mode & S_IFREG)
 	{
-		if (std::remove(uri.c_str()))
+		if (!std::remove(uri.c_str()))
 		{
-			fileNotFound(it->second.root);
-			return;
+			std::string body = "<html>\n\t<body>\n"
+							   "\t\t<h1>File deleted.</h1>\n"
+							   "\t</body>\n</html>";
+			_fileLength = body.length();
+			std::string header = makeHeader(uri, body, "200 OK", "");
+			_fileLength = header.length();
+			_fileSrc = new char[_fileLength + 1];
+			for (size_t i = 0; i < _fileLength; ++i)
+				_fileSrc[i] = header[i];
+			_fileSrc[_fileLength] = 0;
 		}
+		else
+			fileNotFound(it->second.root);
 	}
 	else if (buf.st_mode & S_IFDIR)
-	{
 		fileNotFound(it->second.root);
-		return;
-	}
-	std::string body = "<html>\n"
-					   "\t<body>\n"
-					   "\t\t<h1>File deleted.</h1>\n"
-					   "\t</body>\n"
-					   "</html>";
-	_fileLength = body.length();
-	std::string header = makeHeader(uri, body, "200 OK", "");
-	_fileLength = header.length();
-	_fileSrc = new char[_fileLength + 1];
-	for (size_t i = 0; i < _fileLength; ++i)
-		_fileSrc[i] = header[i];
-	_fileSrc[_fileLength] = 0;
+	return 0;
 }
 
-void Response::responseOnPut()
+int Response::responseOnPut()
 {
 	std::map<std::string, Location>::iterator it;
 	int cod = findLocation(&it);
-	if (cod || !it->second.methods["PUT"])
-	{
-		methodnotallowed(it->second.root);
-		return;
-	}
+	if (it->second.redirect.first == 301 && !it->second.redirect.second.empty())
+		cod = rediraction(&it);
+	if (cod == 1)
+		return returnErrors();
+	if (!it->second.methods["PUT"])
+		return methodnotallowed(it->second.root);
 	std::string uri = it->second.root;
 	if (_request.getUri().substr(it->first.length())[0] != '/')
 		uri += "/";
@@ -146,7 +141,32 @@ void Response::responseOnPut()
 		createResponseWOCgi(uri, "200 OK");
 	else if (buf.st_mode & S_IFDIR)
 		fileNotFound(it->second.root);
+	return 0;
 }
+
+int Response::responseOnHead()
+{
+	std::map<std::string, Location>::iterator it;
+	int cod = findLocation(&it);
+	if (it->second.redirect.first == 301 && !it->second.redirect.second.empty())
+		cod = rediraction(&it);
+	if (cod == 1)
+		return returnErrors();
+	if (!it->second.methods["PUT"])
+		return methodnotallowed(it->second.root);
+	responseOnGet();
+	std::string resp = std::string(_fileSrc, _fileLength);
+	unsigned long len = resp.find(CRLF_END) + 4;
+	char *oldResp = _fileSrc;
+	_fileSrc = new char[len + 1];
+	for (int i = 0; i < len; ++i)
+		_fileSrc[i] = oldResp[i];
+	_fileLength = len;
+	_fileSrc[len] = 0;
+	delete[] oldResp;
+	return 0;
+}
+
 
 std::pair<char *, int> Response::toFront()
 {

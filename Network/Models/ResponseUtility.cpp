@@ -5,18 +5,21 @@ int Response::findLocation(std::map<std::string, Location>::iterator *it)
 {
 	std::string uri = _request.getUri();
 	deleteMultiSl(uri);
-	bool f = true;
-	while (!uri.empty() && f)
+	while (!uri.empty())
 	{
 		for (*it = _serverSettings.locations.begin(); *it != _serverSettings.locations.end(); ++(*it))
+		{
 			if ((*it)->first.find(uri) != std::string::npos)
 				return 0;
-			if (f && uri != "/" && !uri.empty())
-			{
-				uri.erase(uri.rfind('/') + 1, uri.length());
-				if (uri != "/")
-					uri.erase(uri.rfind('/'));
-			}
+		}
+		if (uri == "/")
+			return 1;
+		if (uri != "/" && !uri.empty())
+		{
+			uri.erase(uri.rfind('/') + 1, uri.length());
+			if (uri != "/")
+				uri.erase(uri.rfind('/'));
+		}
 	}
 	return 1;
 }
@@ -189,7 +192,33 @@ std::string Response::getdate()
 	return date;
 }
 
-void Response::errorFileExist()
+int Response::rediraction(std::map<std::string, Location>::iterator *it)
+{
+	int newUrlStart = (*it)->second.redirect.second.find(std::to_string(_serverSettings.port));
+	std::string newUrl = (*it)->second.redirect.second.substr(newUrlStart + std::to_string(_serverSettings.port).length());
+	_request.setUri(newUrl);
+	(*it) = _serverSettings.locations.begin();
+	int cod = findLocation(it);
+	return cod;
+}
+
+int Response::returnErrors()
+{
+	std::string body = "<html>\n\t<body>\n"
+					   "\t\t<h1>503 Service Unavailable</h1>\n"
+					   "\t</body>\n</html>";
+	_fileLength = body.length();
+	std::string uri = "html";
+	std::string header = makeHeader(uri, body, "503 Service Unavailable", "");
+	_fileLength = header.length();
+	_fileSrc = new char[_fileLength + 1];
+	for (size_t i = 0; i < _fileLength; ++i)
+		_fileSrc[i] = header[i];
+	_fileSrc[_fileLength] = 0;
+	return 0;
+}
+
+void Response::errorFileNotExist()
 {
 	char buffer[PATH_MAX];
 	getcwd(buffer, sizeof(buffer));
@@ -215,12 +244,11 @@ void Response::errorFileExist()
 	_fileSrc[_fileLength] = 0;
 }
 
-void Response::errorFileNotExist(std::string &path)
+void Response::errorFileExist(std::string &path, int fd)
 {
 	char buff[1025];
 	std::string src;
 	long len;
-	int fd;
 	while ((len = read(fd, buff, 1024)) > 0)
 	{
 		_fileLength += len;
@@ -245,9 +273,9 @@ void Response::fileNotFound(std::string root)
 	path = root + it->second;
 	int fd = open(path.c_str(), O_RDONLY);
 	if (fd < 0)
-		errorFileExist();
+		errorFileNotExist();
 	else
-		errorFileNotExist(path);
+		errorFileExist(path, fd);
 }
 
 void	Response::generateResponse(std::string uri, std::map<std::string, Location>::iterator it)
@@ -317,7 +345,7 @@ void Response::genetateResponseAutoIn(DIR *dir, struct dirent *ent, std::string 
 	_fileSrc[_fileLength] = 0;
 }
 
-void Response::methodnotallowed(std::string root)
+int Response::methodnotallowed(std::string root)
 {
 	std::map<int, std::string>::iterator it = _serverSettings.errorPages.begin();
 	for (; it != _serverSettings.errorPages.end() && it->first != 405; ++it) {	}
@@ -346,25 +374,5 @@ void Response::methodnotallowed(std::string root)
 			_fileSrc[i] = src[i];
 		_fileSrc[_fileLength] = 0;
 	}
-}
-
-void Response::responseOnHead()
-{
-	std::map<std::string, Location>::iterator it;
-	int cod = findLocation(&it);
-	if (cod || !it->second.methods["HEAD"])
-	{
-		methodnotallowed(it->second.root);
-		return;
-	}
-	responseOnGet();
-	std::string resp = std::string(_fileSrc, _fileLength);
-	unsigned long len = resp.find(CRLF_END) + 4;
-	char *oldResp = _fileSrc;
-	_fileSrc = new char[len + 1];
-	for (int i = 0; i < len; ++i)
-		_fileSrc[i] = oldResp[i];
-	_fileLength = len;
-	_fileSrc[len] = 0;
-	delete[] oldResp;
+	return 0;
 }
