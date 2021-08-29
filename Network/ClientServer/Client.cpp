@@ -27,17 +27,20 @@ void	Client::recvChunked() {
 			    bufferLenght.append(buffer, nDataLength);
 			}
 		} while ((konec = (char*)strstr(bufferLenght.c_str(), (const char*)"\r\n")) == NULL);
-		std::cout << "\"" << bufferLenght << "\"" << std::endl;
 		konec += 2;
-		bufferIzlishek = konec;
+		bufferIzlishek = std::string(konec);
+//		bufferIzlishek += strdup(konec);
 		bufferLenght = bufferLenght.substr(0, konec - bufferLenght.c_str());
-		std::cout << "Len:" << bufferLenght << std::endl;
 		contentLenght = strtol(bufferLenght.c_str(), & p, 16) + 2;
+		std::cout << "Skolko schitat" << contentLenght - bufferIzlishek.length() << std::endl;
 		char	bufferBody[contentLenght - bufferIzlishek.length()];
-		body.append(bufferIzlishek);
+		if (bufferIzlishek.length() > 2)
+            body.append(bufferIzlishek);
 		if (contentLenght - bufferIzlishek.length() > 0) {
-		    nDataLength = recv(getSocket(), bufferBody, contentLenght - bufferIzlishek.length(), 0);
+		    std::cout << " Ya tut" << std::endl;
+		    nDataLength = recv(getSocket(), &bufferBody, contentLenght - bufferIzlishek.length(), 0);
 		    body.append(bufferBody);
+		    std::cout << nDataLength << std::endl;
 		}
 		bufferLenght = "";
 	} while (contentLenght > 2);
@@ -58,8 +61,10 @@ int		Client::recvMsg() {
 	if ((konec = strstr(_message.c_str(), (const char*)"\r\n\r\n")) != NULL) {
 		std::string body = std::string(konec + 4);
 		_message = _message.substr(0, konec + 4 - _message.c_str());
-		std::cout << _message;
+		std::cout << "\"" << _message << "\"";
 		_req.parsRequest(_message);
+		if (_req.getMethod() == "HEAD")
+		    std::cout <<"";
 		if (_req.getMethod() != "GET" && _req.getMethod() != "HEAD") {
 			if (_req.getValueMapHeader("Transfer-Encoding") == "chunked") {
 				recvChunked();
@@ -88,6 +93,7 @@ int		Client::sendMsg() {
 	int result = send(_socket, _res->toFront().first, _res->toFront().second, 0);
 	_req = Request();
 	delete(_res);
+	_message.clear();
 	return result;
 }
 
