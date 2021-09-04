@@ -32,7 +32,6 @@ void Request::printMap() {
 }
 
 void Request::_parsFirstHeader(const std::string& buffer) {
-    std::cout << "PARS " << std::endl;
     _method = buffer.substr(0, _findNth(buffer, 1, " "));
     if (_method.find("HEAD") != std::string::npos)
         _method = "HEAD";
