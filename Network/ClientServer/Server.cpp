@@ -17,9 +17,9 @@ void Server::run () {
 
 			if (_fdMax < _clients[i]->getSocket())
 				_fdMax = _clients[i]->getSocket();
+			FD_SET(_clients[i]->getSocket(), &_readFds);
 			if (_clients[i]->getStage() == true) {
 				std::cout << "Stage reading..." << _clients[i]->getSocket() << std::endl;
-			    FD_SET(_clients[i]->getSocket(), &_readFds);
 			} else {
 				std::cout << "Stage writing..." << _clients[i]->getSocket() << std::endl;
 				FD_SET(_clients[i]->getSocket(), &_writeFds);
@@ -65,7 +65,7 @@ void Server::readEvent(Client & connection) {
         connection.changeStage();
 		std::cout << "--------------------\n";
 	}
-	else if (ret == 0) {
+	else if (ret == Client::CLOSE) {
 		for (size_t i = 0; i < _clients.size(); i++) {
 			if (_clients[i]->getSocket() == connection.getSocket())
 				disconnectEvent(connection, i);

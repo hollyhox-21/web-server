@@ -18,7 +18,8 @@ class Client {
 		enum STATE {
 			HEADERS,
 			BODY,
-			END
+			END,
+			CLOSE
 		};
 
 		Client(int socket);

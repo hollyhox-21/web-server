@@ -63,16 +63,18 @@ Client::STATE	Client::recvHeaders() {
 	int nDataLength;
 	const char	*konec;
 
+	std::cout << "------HEADERS-------\n";
+
 	nDataLength = recv(getSocket(), buffer, BUFFER_SIZE, 0);
-	// if (nDataLength == -1) {
-	// 	return (-1);
-	// }
+	if (nDataLength == 0) {
+		return (_state = CLOSE);
+	}
 	_header.append(buffer, nDataLength);
 	if ((konec = strstr(_header.c_str(), (const char*)"\r\n\r\n")) != NULL) {
 		std::cout << "--------------------\nСырые хедеры\n" << _header << "--------------------\n";
 		_body = _header.substr(0, konec + 4 - _header.c_str());
 		_req.parsRequest(_header);
-		return (_state = HEADERS);
+		return (_state = BODY);
 	}
 	return (_state);
 }
@@ -80,6 +82,7 @@ Client::STATE	Client::recvHeaders() {
 Client::STATE	Client::recvBody() {
 	int nDataLength;
 
+	std::cout << "------BODY-------\n";
 	if (_req.getMethod() != "GET" && _req.getMethod() != "HEAD") {
 		// if (_req.getValueMapHeader("Content-Length") == "")
 		// 	return -1;
@@ -87,27 +90,32 @@ Client::STATE	Client::recvBody() {
 					(int)_body.length() < atoi(_req.getValueMapHeader("Content-Length").c_str())){
 			char	bufferBody[BUF_SIZE];
 			nDataLength = recv(getSocket(), bufferBody, BUF_SIZE, 0);
+			std::cout << "Ya chitau\n";
+			if (nDataLength == 0)
+				return (_state = END);
 			_body.append(bufferBody, nDataLength);
 		} else {
 			_state = END;
 			if (_req.getValueMapHeader("Transfer-Encoding") == "chunked")
 				std::cout << ""; // parsing чанк
 		}
+	} else {
+		return (_state = END);
 	}
 	return (_state);
 }
 
 Client::STATE		Client::recvMsg() {
-
-	switch (_state)
-	{
-		case HEADERS:
-			return recvHeaders();
-		case BODY:
-			return recvBody();
-		default:
-			return END;
+	if (_state == HEADERS) {
+		if (recvHeaders() == HEADERS)
+			return (HEADERS);
 	}
+	if (_state == BODY) {
+		if (recvBody() == BODY)
+			return (BODY);
+	}
+	std::cout << "konec";
+	return END;
 }
 
 int		Client::sendMsg() {
