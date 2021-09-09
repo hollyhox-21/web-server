@@ -1,5 +1,4 @@
 #include "Client.hpp"
-#define BUF_SIZE 100000
 
 Client::Client(int socket) {
 	_socket = socket;
@@ -12,67 +11,41 @@ Client::~Client() {
 }
 
 void	Client::recvChunked() {
-	int				nDataLength;
-	long			contentLenght = 0;
 	char			*p;
-	char			buffer[BUFFER_SIZE + 1];
-	std::string		bufferLenght;
-	std::string		body;
-	std::string     bufferIzlishek;
-	char		    *konec;
+	std::size_t		contentLength = 0;
 
-	do {
-		do {
-			nDataLength = recv(getSocket(), buffer, BUFFER_SIZE, 0);
-			if (nDataLength > 0) {
-			    buffer[nDataLength] = 0;
-			    bufferLenght.append(buffer, nDataLength);
-			}
-		} while ((konec = (char*)strstr(bufferLenght.c_str(), (const char*)"\r\n")) == NULL);
-		std::cout << "Posle pervogo while " << bufferLenght << std::endl;
-		konec += 2;
-		bufferIzlishek = std::string(konec);
-//		bufferIzlishek += strdup(konec);
-		bufferLenght = bufferLenght.substr(0, konec - bufferLenght.c_str());
-		contentLenght = strtol(bufferLenght.c_str(), & p, 16) + 2;
-		int skolkoschitat = contentLenght - bufferIzlishek.length();
-		std::cout << "Content length " << bufferLenght << " | " << contentLenght << std::endl;
-		std::cout << "Skolko schitat " << skolkoschitat << std::endl;
-		char	bufferBody[skolkoschitat];
-		if (bufferIzlishek.length() > 2)
-            body.append(bufferIzlishek);
-		if (skolkoschitat > 0) {
-		    while (skolkoschitat > 0 && nDataLength > 0) {
-				nDataLength = read(getSocket(), &bufferBody, skolkoschitat);
-				body.append(bufferBody);
-				std::cout << "Skolko schital " << nDataLength << std::endl;
-				skolkoschitat -= nDataLength;
-			} 
-			if (nDataLength == -1)
-				strerror(errno);
-		}
-		bufferLenght = "";
-	} while (contentLenght > 2);
-	std::cout << "--------------------\nBody after chunk:\n" << body << "--------------------" << std::endl;
-	_req.parsBody(body);
+	std::cout << "Chunked" << std::endl;
+	while (_chunkedBody.find("\r\n") != std::string::npos) {
+		std::size_t index = _chunkedBody.find("\r\n") + 2;
+		std::string size = _chunkedBody.substr(index);
+		_chunkedBody.erase(0, index);
+		contentLength = strtol(size.c_str(), & p, 16) + 2;
+		_body.append(_chunkedBody.substr(contentLength));
+		index = _chunkedBody.find("\r\n") + 2;
+		_chunkedBody.erase(0, index);
+	}
 }
 
 
 Client::STATE	Client::recvHeaders() {
-	char buffer[BUFFER_SIZE];
 	int nDataLength;
 	const char	*konec;
 
 	std::cout << "------HEADERS-------\n";
 
-	nDataLength = recv(getSocket(), buffer, BUFFER_SIZE, 0);
-	if (nDataLength == 0) {
+	nDataLength = recv(getSocket(), _buffer, BUFFER_SIZE, 0);
+	if (nDataLength == 0) 
 		return (_state = CLOSE);
-	}
-	_header.append(buffer, nDataLength);
+	else if (nDataLength == -1)
+		return (_state = HEADERS);
+	_buffer[nDataLength] = 0;
+	std::cout << "Сырой буфер\n" << _buffer << "--------------------\n";
+	_header.append(_buffer, nDataLength);
 	if ((konec = strstr(_header.c_str(), (const char*)"\r\n\r\n")) != NULL) {
-		std::cout << "--------------------\nСырые хедеры\n" << _header << "--------------------\n";
-		_body = _header.substr(0, konec + 4 - _header.c_str());
+		std::cout << "Сырые хедеры\n" << _header << "--------------------\n";
+		_body = _header.substr(konec + 4 - _header.c_str());
+		_chunkedBody = _body;
+		std::cout << _body;
 		_req.parsRequest(_header);
 		return (_state = BODY);
 	}
@@ -86,18 +59,26 @@ Client::STATE	Client::recvBody() {
 	if (_req.getMethod() != "GET" && _req.getMethod() != "HEAD") {
 		// if (_req.getValueMapHeader("Content-Length") == "")
 		// 	return -1;
-		if ((_req.getValueMapHeader("Transfer-Encoding") == "chunked" && _req.getBody().find("0\r\n\r\n") == std::string::npos) || 
+		if ((_req.getValueMapHeader("Transfer-Encoding") == "chunked" && _chunkedBody.find("0\r\n\r\n") != std::string::npos) || 
 					(int)_body.length() < atoi(_req.getValueMapHeader("Content-Length").c_str())){
-			char	bufferBody[BUF_SIZE];
-			nDataLength = recv(getSocket(), bufferBody, BUF_SIZE, 0);
-			std::cout << "Ya chitau\n";
+			nDataLength = recv(getSocket(), _buffer, BUFFER_SIZE, 0);
 			if (nDataLength == 0)
 				return (_state = END);
-			_body.append(bufferBody, nDataLength);
+			else if (nDataLength == -1)
+				return (_state = BODY);
+			_buffer[nDataLength] = 0;
+			std::cout << "Ya chitau " << nDataLength << "\n";
+			std::cout << _buffer;
+			std::cout << "--------------------\nBody: ";
+			if (_req.getValueMapHeader("Transfer-Encoding") == "chunked")
+				_chunkedBody.append(_buffer);
+			else
+				_body.append(_buffer);
+			std::cout << _chunkedBody << "Len: " << _chunkedBody.length() << "\n-----------------\n";
 		} else {
 			_state = END;
 			if (_req.getValueMapHeader("Transfer-Encoding") == "chunked")
-				std::cout << ""; // parsing чанк
+				recvChunked();
 		}
 	} else {
 		return (_state = END);

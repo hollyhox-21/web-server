@@ -41,8 +41,10 @@ class Client {
 		STATE			_state;
 		int				_socket;
 		bool			_read;
+		char			_buffer[BUFFER_SIZE + 1];
 		std::string		_header;
 		std::string		_body;
+		std::string		_chunkedBody;
 		Request			_req;
 		Response		*_res;
 
