@@ -105,6 +105,7 @@ int		Client::sendMsg() {
 	delete(_res);
 	_header.clear();
 	_body.clear();
+	_chunkedBody.clear();
 	_state = HEADERS;
 	return result;
 }
