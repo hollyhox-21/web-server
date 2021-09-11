@@ -59,11 +59,8 @@ int Response::responseOnPost()
 		return returnErrors();
 	if (!it->second.methods["POST"])
 		return methodnotallowed(it->second.root);
-	std::string uri = it->second.root;
-	if (_request.getUri().substr(it->first.length())[0] != '/')
-		uri += "/";
+	std::string uri = it->second.root + "/";
 	uri += _request.getUri().substr(_request.getUri().find(it->first) + it->first.length());
-//	uri += _request.getUri().substr(it->first.length());
 	deleteMultiSl(uri);
 	struct stat buf;
 	::stat(uri.c_str(), &buf);
@@ -86,11 +83,8 @@ int Response::responseOnDelete()
 		return returnErrors();
 	if (!it->second.methods["DELETE"])
 		return methodnotallowed(it->second.root);
-	std::string uri = it->second.root;
-	if (_request.getUri().substr(it->first.length())[0] != '/')
-		uri += "/";
+	std::string uri = it->second.root + "/";
 	uri += _request.getUri().substr(_request.getUri().find(it->first) + it->first.length());
-	//	uri += _request.getUri().substr(it->first.length());
 	deleteMultiSl(uri);
 	struct stat buf;
 	if (::stat(uri.c_str(), &buf) != 0)
@@ -128,11 +122,8 @@ int Response::responseOnPut()
 		return returnErrors();
 	if (!it->second.methods["PUT"])
 		return methodnotallowed(it->second.root);
-	std::string uri = it->second.root;
-	if (_request.getUri().substr(it->first.length())[0] != '/')
-		uri += "/";
+	std::string uri = it->second.root + "/";
 	uri += _request.getUri().substr(_request.getUri().find(it->first) + it->first.length());
-	//	uri += _request.getUri().substr(it->first.length());
 	deleteMultiSl(uri);
 	struct stat buf;
 	if (::stat(uri.c_str(), &buf) != 0)
