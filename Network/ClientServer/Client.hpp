@@ -12,28 +12,43 @@
 # define BUFFER_SIZE 256
 
 class Client {
-	private:
-		int				_socket;
-		bool			_read;
-		std::string		_message;
-		Request			_req;
-		Response		*_res;
 
-
-		void			recvChunked();
 	public:
+
+		enum STATE {
+			HEADERS,
+			BODY,
+			END,
+			CLOSE
+		};
+
 		Client(int socket);
 		~Client();
 
-		int				recvMsg();
+		STATE			recvMsg();
 		int 			sendMsg();
 		void			changeStage();
+		STATE			recvHeaders();
+		STATE			recvBody();
 
-		std::string		getMessage();
 		int				getSocket();
 		bool			getStage();
+		STATE			getState();
 		Request&		getRequest() { return _req; }
 		void			setResponse(t_server &serverSettings);
+
+	private:
+		STATE			_state;
+		int				_socket;
+		bool			_read;
+		char			_buffer[BUFFER_SIZE + 1];
+		std::string		_header;
+		std::string		_body;
+		std::string		_chunkedBody;
+		Request			_req;
+		Response		*_res;
+
+		void			recvChunked();
 };
 
 #endif
