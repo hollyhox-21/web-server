@@ -1,7 +1,7 @@
 #include "Request.hpp"
 
 Request::Request() :
-	_method(""), _uri(""), _proto(""), _body(""), _header("") {
+_method(""), _uri(""), _proto(""), _body(""), _header(""), _mapHeaders(std::map<std::string, std::string>()) {
 }
 
 Request::~Request() {}
@@ -32,7 +32,9 @@ void Request::printMap() {
 }
 
 void Request::_parsFirstHeader(const std::string& buffer) {
-	_method = buffer.substr(0, _findNth(buffer, 1, " "));
+    _method = buffer.substr(0, _findNth(buffer, 1, " "));
+    if (_method.find("HEAD") != std::string::npos)
+        _method = "HEAD";
 	_uri = buffer.substr(_findNth(buffer, 1, " ") + 1,
 						 _findNth(buffer, 2, " ") - _findNth(buffer, 1, " ") - 1);
 	_proto = buffer.substr(_findNth(buffer, 2, " ") + 1, buffer.length() - _findNth(buffer, 2, " "));

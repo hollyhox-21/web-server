@@ -19,7 +19,6 @@ int main(int ac, char **av) {
 			pthread_t s;
 			for (size_t i = 0; i < Servers.size(); ++i)
 			{
-				std::cout << i << std::endl;
 				Servers[i]->ready();
 				pthread_create(&s, NULL, &runServer, Servers[i]);
 			}

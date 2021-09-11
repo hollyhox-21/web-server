@@ -56,14 +56,16 @@ void Server::connectEvent(Client & connection) {
 }
 void Server::readEvent(Client & connection) {
 	std::cout << "Reading " << connection.getSocket() << std::endl;
-	int ret = connection.recvMsg();
-	if (ret == -2) {
+	Client::STATE ret = connection.recvMsg();
+	if (ret == Client::END) {
+		std::cout << "--------------------\nГотовый рек:\n";
 		connection.getRequest().printRequest();
 		connection.getRequest().printMap();
 		std::cout << "Body: " << connection.getRequest().getBody() << std::endl;
-		connection.changeStage();
+        connection.changeStage();
+		std::cout << "--------------------\n";
 	}
-	else if (ret == 0) {
+	else if (ret == Client::CLOSE) {
 		for (size_t i = 0; i < _clients.size(); i++) {
 			if (_clients[i]->getSocket() == connection.getSocket())
 				disconnectEvent(connection, i);
