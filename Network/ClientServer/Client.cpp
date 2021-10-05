@@ -19,11 +19,8 @@ void	Client::recvChunked() {
 		std::size_t index = _chunkedBody.find("\r\n") + 2;
 		std::string size = _chunkedBody.substr(0, index);
 		_chunkedBody.erase(0, index);
-		// std::cout << "Size: " << size << std::endl;
 		contentLength = strtol(size.c_str(), & p, 16) + 2;
-		// std::cout << "Content-Length: " << contentLength << std::endl;
 		_body.append(_chunkedBody.substr(0, contentLength));
-		// std::cout << "Body: " << _body << std::endl;
 		index = _chunkedBody.find("\r\n") + 2;
 		_chunkedBody.erase(0, index);
 	}
@@ -48,7 +45,6 @@ Client::STATE	Client::recvHeaders() {
 		std::cout << "Сырые хедеры\n" << _header << "--------------------\n";
 		_body = _header.substr(konec + 4);
 		_chunkedBody = _body;
-		std::cout << _body;
 		_req.parsRequest(_header);
 		return (_state = BODY);
 	}
@@ -71,13 +67,14 @@ Client::STATE	Client::recvBody() {
 				return (_state = BODY);
 			_buffer[nDataLength] = 0;
 			std::cout << "Ya chitau " << nDataLength << "\n";
-			std::cout << _buffer;
-			std::cout << "--------------------\n";
+			// std::cout << _buffer;
+			// std::cout << "--------------------\n";
 			if (_req.getValueMapHeader("Transfer-Encoding") == "chunked")
 				_chunkedBody.append(_buffer);
 			else
 				_body.append(_buffer);
-			std::cout << "Body: \""<< _chunkedBody << "\"\n";
+			// std::cout << "Body: \""<< _chunkedBody << "\"\n";
+			std::cout << "Body len " << _body.length() << "\n";
 			if (std::string::npos != _chunkedBody.find("0\r\n\r\n"))
 				std::cout << "find\n";
 			std::cout << "Len: " << _chunkedBody.length() << "\n-----------------\n";

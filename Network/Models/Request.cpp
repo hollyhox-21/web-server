@@ -19,7 +19,7 @@ void print_buffer(std::string & buffer) {
 }
 
 void Request::printRequest() {
-	printf("%s|\n%s|\n%s|\n%s|", _method.c_str(), _uri.c_str(), _proto.c_str(), _body.c_str());
+	printf("%s|\n%s|\n%s|\nBody:\n%s", _method.c_str(), _uri.c_str(), _proto.c_str(), _body.c_str());
 }
 
 void Request::printMap() {

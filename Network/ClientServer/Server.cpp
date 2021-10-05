@@ -17,9 +17,9 @@ void Server::run () {
 
 			if (_fdMax < _clients[i]->getSocket())
 				_fdMax = _clients[i]->getSocket();
-			FD_SET(_clients[i]->getSocket(), &_readFds);
 			if (_clients[i]->getStage() == true) {
 				std::cout << "Stage reading..." << _clients[i]->getSocket() << std::endl;
+				FD_SET(_clients[i]->getSocket(), &_readFds);
 			} else {
 				std::cout << "Stage writing..." << _clients[i]->getSocket() << std::endl;
 				FD_SET(_clients[i]->getSocket(), &_writeFds);
@@ -59,9 +59,9 @@ void Server::readEvent(Client & connection) {
 	Client::STATE ret = connection.recvMsg();
 	if (ret == Client::END) {
 		std::cout << "--------------------\nГотовый рек:\n";
-		connection.getRequest().printRequest();
+		// connection.getRequest().printRequest();
 		connection.getRequest().printMap();
-		std::cout << "Body: " << connection.getRequest().getBody() << std::endl;
+		// std::cout << "Body: " << connection.getRequest().getBody() << std::endl;
         connection.changeStage();
 		std::cout << "--------------------\n";
 	}
