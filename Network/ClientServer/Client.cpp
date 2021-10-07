@@ -2,13 +2,28 @@
 
 Client::Client(int socket) {
 	_socket = socket;
-	_read = true;
-	_state = HEADERS;
+	_state = END;
 }
 
 Client::~Client() {
 	close(_socket);
 }
+
+Client::STATE Client::start() {
+	_state = HEADERS;
+	_req = new Request();
+	return (_state);
+}
+
+Client::STATE Client::end() {
+	_state = END;
+	delete(_res);
+	_header.clear();
+	_body.clear();
+	_chunkedBody.clear();
+	return (_state);
+}
+
 
 void	Client::recvChunked() {
 	char			*p;
@@ -45,7 +60,7 @@ Client::STATE	Client::recvHeaders() {
 		std::cout << "Сырые хедеры\n" << _header << "--------------------\n";
 		_body = _header.substr(konec + 4);
 		_chunkedBody = _body;
-		_req.parsRequest(_header);
+		_req->parsRequest(_header);
 		return (_state = BODY);
 	}
 	return (_state);
@@ -54,12 +69,12 @@ Client::STATE	Client::recvHeaders() {
 Client::STATE	Client::recvBody() {
 	int nDataLength;
 
-	if (_req.getMethod() != "GET" && _req.getMethod() != "HEAD") {
+	if (_req->getMethod() != "GET" && _req->getMethod() != "HEAD") {
 		std::cout << "------BODY-------\n";
-		// if (_req.getValueMapHeader("Content-Length") == "")
+		// if (_req->getValueMapHeader("Content-Length") == "")
 		// 	return -1;
-		if ((_req.getValueMapHeader("Transfer-Encoding") == "chunked")
-										 || (int)_body.length() < atoi(_req.getValueMapHeader("Content-Length").c_str())) {
+		if ((_req->getValueMapHeader("Transfer-Encoding") == "chunked")
+										 || (int)_body.length() < atoi(_req->getValueMapHeader("Content-Length").c_str())) {
 			nDataLength = recv(getSocket(), _buffer, BUFFER_SIZE, 0);
 			if (nDataLength == 0)
 				return (_state = END);
@@ -69,7 +84,7 @@ Client::STATE	Client::recvBody() {
 			std::cout << "Ya chitau " << nDataLength << "\n";
 			// std::cout << _buffer;
 			// std::cout << "--------------------\n";
-			if (_req.getValueMapHeader("Transfer-Encoding") == "chunked")
+			if (_req->getValueMapHeader("Transfer-Encoding") == "chunked")
 				_chunkedBody.append(_buffer);
 			else
 				_body.append(_buffer);
@@ -80,7 +95,7 @@ Client::STATE	Client::recvBody() {
 			std::cout << "Len: " << _chunkedBody.length() << "\n-----------------\n";
 		} if (_chunkedBody.find("0\r\n\r\n") != std::string::npos) {
 			_state = END;
-			if (_req.getValueMapHeader("Transfer-Encoding") == "chunked")
+			if (_req->getValueMapHeader("Transfer-Encoding") == "chunked")
 				recvChunked();
 			// std::cout << "Body: " << _body << std::endl;
 			return (_state);
@@ -92,6 +107,9 @@ Client::STATE	Client::recvBody() {
 }
 
 Client::STATE		Client::recvMsg() {
+	if (_state == END) {
+		start();
+	}
 	if (_state == HEADERS) {
 		if (recvHeaders() == HEADERS)
 			return (HEADERS);
@@ -100,32 +118,34 @@ Client::STATE		Client::recvMsg() {
 		if (recvBody() == BODY)
 			return (BODY);
 	}
-	_req.parsBody(_body);
-	std::cout << "konec";
-	return END;
+	_req->parsBody(_body);
+	std::cout << "------konec------\n";
+	return (_state = SEND);
 }
 
-int		Client::sendMsg() {
-	int result = send(_socket, _res->toFront().first, _res->toFront().second, 0);
-	_req = Request();
-	delete(_res);
-	_header.clear();
-	_body.clear();
-	_chunkedBody.clear();
-	_state = HEADERS;
-	return result;
-}
+Client::STATE		Client::sendMsg() {
+	char * message = _res->getMessage();
+	unsigned long messageLength = _res->getMessageLength();
+	int result = 0;
+	if (messageLength > 0) {
+		if (messageLength > CHUNK_SIZE) {
+			result = send(_socket, message, CHUNK_SIZE, 0);
+		} else {
+			result = send(_socket, message, messageLength, 0);
+		}
+		std::cout << "res: " << result << std::endl;
+		_res->setMessage(strdup(message + result));
+		_res->setMessageLength(messageLength - result);
 
-void	Client::changeStage() {
-	_read = !_read;
+	}
+	if (_res->getMessageLength() == 0) {
+		return end();
+	}
+	return _state;
 }
 
 int		Client::getSocket() {
 	return _socket;
-}
-
-bool	Client::getStage() {
-	return _read;
 }
 
 Client::STATE		Client::getState() {
@@ -134,9 +154,5 @@ Client::STATE		Client::getState() {
 
 
 void	Client::setResponse(t_server &serverSettings) {
-	_res = new Response(_req, serverSettings);
-//	if (_res->toFront().first != NULL && std::string(_res->toFront().first).find("text/html") != std::string::npos) {
-	// std::cout << "\n\nResponse\n";
-	// write(1, _res->toFront().first, _res->toFront().second);
-//	}
+	_res = new Response(*_req, serverSettings);
 }

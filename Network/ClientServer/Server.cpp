@@ -17,10 +17,10 @@ void Server::run () {
 
 			if (_fdMax < _clients[i]->getSocket())
 				_fdMax = _clients[i]->getSocket();
-			if (_clients[i]->getStage() == true) {
+			if (_clients[i]->getState() == Client::HEADERS || _clients[i]->getState() == Client::BODY || _clients[i]->getState() == Client::END) {
 				std::cout << "Stage reading..." << _clients[i]->getSocket() << std::endl;
 				FD_SET(_clients[i]->getSocket(), &_readFds);
-			} else {
+			} else if (_clients[i]->getState() == Client::SEND) {
 				std::cout << "Stage writing..." << _clients[i]->getSocket() << std::endl;
 				FD_SET(_clients[i]->getSocket(), &_writeFds);
 			}
@@ -57,13 +57,13 @@ void Server::connectEvent(Client & connection) {
 void Server::readEvent(Client & connection) {
 	std::cout << "Reading " << connection.getSocket() << std::endl;
 	Client::STATE ret = connection.recvMsg();
-	if (ret == Client::END) {
+	if (ret == Client::SEND) {
 		std::cout << "--------------------\nГотовый рек:\n";
-		// connection.getRequest().printRequest();
-		connection.getRequest().printMap();
+		connection.getRequest()->printRequest();
+		connection.getRequest()->printMap();
 		// std::cout << "Body: " << connection.getRequest().getBody() << std::endl;
-        connection.changeStage();
 		std::cout << "--------------------\n";
+		connection.setResponse(getSettings());
 	}
 	else if (ret == Client::CLOSE) {
 		for (size_t i = 0; i < _clients.size(); i++) {
@@ -79,10 +79,8 @@ void Server::disconnectEvent(Client & connection, int index) {
 }
 void Server::sendEvent(Client & connection) {
 	std::cout << "Msg: " << connection.getSocket() << std::endl;
-	connection.setResponse(getSettings());
-	int ret = connection.sendMsg();
-	connection.changeStage();
-	if (ret == 0) {
+	Client::STATE ret = connection.sendMsg();
+	if (ret == Client::CLOSE) {
 		for (size_t i = 0; i < _clients.size(); i++) {
 			if (_clients[i]->getSocket() == connection.getSocket())
 				disconnectEvent(connection, i);

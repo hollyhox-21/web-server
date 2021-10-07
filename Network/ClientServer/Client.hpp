@@ -18,6 +18,7 @@ class Client {
 		enum STATE {
 			HEADERS,
 			BODY,
+			SEND,
 			END,
 			CLOSE
 		};
@@ -25,27 +26,26 @@ class Client {
 		Client(int socket);
 		~Client();
 
+		STATE			start();
+		STATE			end();
 		STATE			recvMsg();
-		int 			sendMsg();
-		void			changeStage();
+		STATE 			sendMsg();
 		STATE			recvHeaders();
 		STATE			recvBody();
 
 		int				getSocket();
-		bool			getStage();
 		STATE			getState();
-		Request&		getRequest() { return _req; }
+		Request*		getRequest() { return _req; }
 		void			setResponse(t_server &serverSettings);
 
 	private:
 		STATE			_state;
 		int				_socket;
-		bool			_read;
 		char			_buffer[BUFFER_SIZE + 1];
 		std::string		_header;
 		std::string		_body;
 		std::string		_chunkedBody;
-		Request			_req;
+		Request			*_req;
 		Response		*_res;
 
 		void			recvChunked();
