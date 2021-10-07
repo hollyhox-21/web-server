@@ -70,17 +70,17 @@ void parseCgiResponse(std::string *a, std::string &header, std::string &body,
 void Response::createCgiResponse(std::string &uri)
 {
 	std::string *a = CgiService::getCgiResponse(_request, _serverSettings);
-	_fileLength = atoi(_request.getValueMapHeader("Content-Length").c_str());
+	_messageLength = atoi(_request.getValueMapHeader("Content-Length").c_str());
 	std::cout << "\n\nPOST CGI:\n\n" << *a;
 	std::string code, type, header, body;
 	parseCgiResponse(a, header, body, code, type);
-	_fileLength = body.length();
+	_messageLength = body.length();
 	body = makeHeader(uri, body, code, type);
-	_fileSrc = new char[_fileLength + 1];
-	_fileLength = body.length();
-	for (unsigned long i = 0; i < _fileLength; ++i)
-		_fileSrc[i] = body[i];
-	_fileSrc[_fileLength] = 0;
+	_message = new char[_messageLength + 1];
+	_messageLength = body.length();
+	for (unsigned long i = 0; i < _messageLength; ++i)
+		_message[i] = body[i];
+	_message[_messageLength] = 0;
 					  }
 
 void Response::createResponseWOCgi(std::string &uri, std::string code)
@@ -90,14 +90,14 @@ void Response::createResponseWOCgi(std::string &uri, std::string code)
 	int contLength = atoi(
 			_request.getValueMapHeader("Content-Length").c_str());
 	src += _request.getBody();
-	_fileLength = src.length();
+	_messageLength = src.length();
 	src = makeHeader(uri, src, code, "");
-	_fileLength = src.length();
-	_fileSrc = new char[_fileLength + 1];
-	for (unsigned long i = 0; i < _fileLength; ++i)
-		_fileSrc[i] = src[i];
-	_fileSrc[_fileLength] = 0;
-	write(fd, _fileSrc + (_fileLength - contLength), _request.getBody().length());
+	_messageLength = src.length();
+	_message = new char[_messageLength + 1];
+	for (unsigned long i = 0; i < _messageLength; ++i)
+		_message[i] = src[i];
+	_message[_messageLength] = 0;
+	write(fd, _message + (_messageLength - contLength), _request.getBody().length());
 	close(fd);
 }
 
@@ -105,11 +105,19 @@ void Response::createSrc(std::map<std::string, Location>::iterator it, const std
 {
 	std::string src;
 	src = makeHeader(it->second.root, src, code, "");
-	_fileLength = src.length();
-	_fileSrc = new char[_fileLength + 1];
-	for (unsigned long i = 0; i < _fileLength; ++i)
-		_fileSrc[i] = src[i];
-	_fileSrc[_fileLength] = 0;
+	_messageLength = src.length();
+	_message = new char[_messageLength + 1];
+	for (unsigned long i = 0; i < _messageLength; ++i)
+		_message[i] = src[i];
+	_message[_messageLength] = 0;
+}
+
+std::string & Response::makeChunkBody(std::string &body) {
+	std::string temp = body;
+	unsigned long length = _messageLength;
+	while (length > 0) {
+		if ()
+	}
 }
 
 std::string Response::makeHeader(std::string &uri, std::string &src, const std::string& code, const std::string& type)
@@ -119,9 +127,13 @@ std::string Response::makeHeader(std::string &uri, std::string &src, const std::
 	header += code;
 	header += "\r\n";
 	header += "Connection: Keep-Alive\r\n";
-	header += "Content-Length: ";
-	header += std::to_string(_fileLength);
-	header += "\r\n";
+	if (src.length() < CHUNK_SIZE) {
+		header += "Content-Length: ";
+		header += std::to_string(_messageLength);
+		header += "\r\n";
+	} else {
+		header += "Transfer-Encoding: chunked\r\n";
+	}
 	if (!type.empty())
 		header += "Content-Type: " + type;
 	else if (uri.rfind(".html") != std::string::npos)
@@ -143,7 +155,7 @@ std::string Response::makeHeader(std::string &uri, std::string &src, const std::
 	header += getdate();
 	header += "\r\n";
 	header += src;
-	_fileLength += header.length();
+	_messageLength += header.length();
 	return header;
 }
 
@@ -207,14 +219,14 @@ int Response::returnErrors()
 	std::string body = "<html>\n\t<body>\n"
 					   "\t\t<h1>503 Service Unavailable</h1>\n"
 					   "\t</body>\n</html>";
-	_fileLength = body.length();
+	_messageLength = body.length();
 	std::string uri = "html";
 	std::string header = makeHeader(uri, body, "503 Service Unavailable", "");
-	_fileLength = header.length();
-	_fileSrc = new char[_fileLength + 1];
-	for (size_t i = 0; i < _fileLength; ++i)
-		_fileSrc[i] = header[i];
-	_fileSrc[_fileLength] = 0;
+	_messageLength = header.length();
+	_message = new char[_messageLength + 1];
+	for (size_t i = 0; i < _messageLength; ++i)
+		_message[i] = header[i];
+	_message[_messageLength] = 0;
 	return 0;
 }
 
@@ -232,16 +244,16 @@ void Response::errorFileNotExist()
 	long len;
 	while ((len = read(fd, buff, 1024)) > 0)
 	{
-		_fileLength += len;
+		_messageLength += len;
 		std::string dst(buff, len);
 		src += dst;
 	}
 	src = makeHeader(path, src, "404 Not Found", "");
-	_fileLength = src.length();
-	_fileSrc = new char[_fileLength + 1];
-	for (unsigned long i = 0; i < _fileLength; ++i)
-		_fileSrc[i] = src[i];
-	_fileSrc[_fileLength] = 0;
+	_messageLength = src.length();
+	_message = new char[_messageLength + 1];
+	for (unsigned long i = 0; i < _messageLength; ++i)
+		_message[i] = src[i];
+	_message[_messageLength] = 0;
 }
 
 void Response::errorFileExist(std::string &path, int fd)
@@ -251,16 +263,16 @@ void Response::errorFileExist(std::string &path, int fd)
 	long len;
 	while ((len = read(fd, buff, 1024)) > 0)
 	{
-		_fileLength += len;
+		_messageLength += len;
 		std::string dst(buff, len);
 		src += dst;
 	}
 	src = makeHeader(path, src, "404 Not Found", "");
-	_fileLength = src.length();
-	_fileSrc = new char[_fileLength + 1];
-	for (unsigned long i = 0; i < _fileLength; ++i)
-		_fileSrc[i] = src[i];
-	_fileSrc[_fileLength] = 0;
+	_messageLength = src.length();
+	_message = new char[_messageLength + 1];
+	for (unsigned long i = 0; i < _messageLength; ++i)
+		_message[i] = src[i];
+	_message[_messageLength] = 0;
 }
 
 void Response::fileNotFound(std::string root)
@@ -293,17 +305,17 @@ void	Response::generateResponse(std::string uri, std::map<std::string, Location>
 		long len;
 		while ((len = read(fd, buff, 1024)) > 0)
 		{
-			_fileLength += len;
+			_messageLength += len;
 			std::string dst(buff, len);
 			src += dst;
 		}
-		_fileLength = src.length();
+		_messageLength = src.length();
 		src = makeHeader(uri, src, "200 OK", "");
-		_fileLength = src.length();
-		_fileSrc = new char[_fileLength + 1];
-		for (unsigned long i = 0; i < _fileLength; ++i)
-			_fileSrc[i] = src[i];
-		_fileSrc[_fileLength] = 0;
+		_messageLength = src.length();
+		_message = new char[_messageLength + 1];
+		for (unsigned long i = 0; i < _messageLength; ++i)
+			_message[i] = src[i];
+		_message[_messageLength] = 0;
 		close(fd);
 	}
 }
@@ -336,13 +348,13 @@ void Response::genetateResponseAutoIn(DIR *dir, struct dirent *ent, std::string 
 		one_line += "\n";
 		src += one_line;
 	}
-	_fileLength = src.length();
+	_messageLength = src.length();
 	src = makeHeader(path, src, "200 OK", "");
-	_fileLength = src.length();
-	_fileSrc = new char[_fileLength + 1];
-	for (unsigned long i = 0; i < _fileLength; ++i)
-		_fileSrc[i] = src[i];
-	_fileSrc[_fileLength] = 0;
+	_messageLength = src.length();
+	_message = new char[_messageLength + 1];
+	for (unsigned long i = 0; i < _messageLength; ++i)
+		_message[i] = src[i];
+	_message[_messageLength] = 0;
 }
 
 int Response::methodnotallowed(std::string root)
@@ -363,16 +375,16 @@ int Response::methodnotallowed(std::string root)
 		long len;
 		while ((len = read(fd, buff, 1024)) > 0)
 		{
-			_fileLength += len;
+			_messageLength += len;
 			std::string dst(buff, len);
 			src += dst;
 		}
 		src = makeHeader(path, src, "405 Method Not Allowed", "");
-		_fileLength = src.length();
-		_fileSrc = new char[_fileLength + 1];
-		for (unsigned long i = 0; i < _fileLength; ++i)
-			_fileSrc[i] = src[i];
-		_fileSrc[_fileLength] = 0;
+		_messageLength = src.length();
+		_message = new char[_messageLength + 1];
+		for (unsigned long i = 0; i < _messageLength; ++i)
+			_message[i] = src[i];
+		_message[_messageLength] = 0;
 	}
 	return 0;
 }

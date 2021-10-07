@@ -4,10 +4,10 @@
 
 Response::~Response()
 {
-	delete _fileSrc;
+	delete _message;
 }
 
-Response::Response(Request &request, t_server &serverSettings): _request(request), _serverSettings(serverSettings), _fileLength(0), _fileSrc(nullptr)
+Response::Response(Request &request, t_server &serverSettings): _request(request), _serverSettings(serverSettings), _messageLength(0), _message(nullptr)
 {
 	if (request.getMethod().find("GET", 0, 3) != std::string::npos)
 		responseOnGet();
@@ -102,13 +102,13 @@ int Response::responseOnDelete()
 			std::string body = "<html>\n\t<body>\n"
 							   "\t\t<h1>File deleted.</h1>\n"
 							   "\t</body>\n</html>";
-			_fileLength = body.length();
+			_messageLength = body.length();
 			std::string header = makeHeader(uri, body, "200 OK", "");
-			_fileLength = header.length();
-			_fileSrc = new char[_fileLength + 1];
-			for (size_t i = 0; i < _fileLength; ++i)
-				_fileSrc[i] = header[i];
-			_fileSrc[_fileLength] = 0;
+			_messageLength = header.length();
+			_message = new char[_messageLength + 1];
+			for (size_t i = 0; i < _messageLength; ++i)
+				_message[i] = header[i];
+			_message[_messageLength] = 0;
 		}
 		else
 			fileNotFound(it->second.root);
@@ -155,20 +155,33 @@ int Response::responseOnHead()
 	if (!it->second.methods["HEAD"])
 		return methodnotallowed(it->second.root);
 	responseOnGet();
-	std::string resp = std::string(_fileSrc, _fileLength);
+	std::string resp = std::string(_message, _messageLength);
 	unsigned long len = resp.find(CRLF_END) + 4;
-	char *oldResp = _fileSrc;
-	_fileSrc = new char[len + 1];
+	char *oldResp = _message;
+	_message = new char[len + 1];
 	for (int i = 0; i < len; ++i)
-		_fileSrc[i] = oldResp[i];
-	_fileLength = len;
-	_fileSrc[len] = 0;
+		_message[i] = oldResp[i];
+	_messageLength = len;
+	_message[len] = 0;
 	delete[] oldResp;
 	return 0;
 }
 
+char *Response::getMessage() {
+	return (_message);
+}
 
-std::pair<char *, int> Response::toFront()
-{
-	return std::pair<char *, int>(_fileSrc, _fileLength);
+unsigned long Response::getMessageLength() {
+	return (_messageLength);
+}
+
+void Response::setMessage(char *message) {
+	if (_message) {
+		delete(_message);
+	}
+	_message = message;
+}
+
+void Response::setMessageLength(unsigned long messageLength) {
+	_messageLength = messageLength;
 }

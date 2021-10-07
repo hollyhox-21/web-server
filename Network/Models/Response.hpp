@@ -18,11 +18,13 @@
 # include <unistd.h>
 # include <ctime>
 
+# define CHUNK_SIZE 1000
+
 class Response
 {
 private:
-	unsigned long _fileLength;
-	char *_fileSrc;
+	unsigned long _messageLength;
+	char *_message;
 	Request &_request;
 	t_server & _serverSettings;
 	int responseOnGet();
@@ -43,13 +45,18 @@ private:
 	void createCgiResponse(std::string &uri);
 	void createResponseWOCgi(std::string &uri, std::string code);
 	std::string makeHeader(std::string &uri, std::string &src, const std::string& code, const std::string& type);
+	std::string & makeChunkBody(std::string &body);
 	static std::string getdate();
 	void	generateResponse(std::string uri, std::map<std::string, Location>::iterator it);
 	void	genetateResponseAutoIn(DIR *dir, struct dirent *ent, std::string src, std::ifstream &file, std::string path);
 public:
 	Response(Request &request, t_server &serverSettings);
 	~Response();
-	std::pair<char *, int> toFront();
+	char *getMessage();
+	unsigned long getMessageLength();
+	void setMessage(char *message);
+	void setMessageLength(unsigned long messageLength);
+	
 };
 
 #endif
