@@ -1,4 +1,5 @@
 #include "Response.hpp"
+#include <sstream>
 
 
 int Response::findLocation(std::map<std::string, Location>::iterator *it)
@@ -114,25 +115,43 @@ void Response::createSrc(std::map<std::string, Location>::iterator it, const std
 
 std::string & Response::makeChunkBody(std::string &body) {
 	std::string temp = body;
+	std::string number;
 	unsigned long length = _messageLength;
-	while (length > 0) {
-		if ()
+	unsigned long index = 0;
+	while (length > index) {
+		if (length - index > CHUNK_SIZE) {
+			if (index == 0)
+				number = (static_cast<std::stringstream const&>(std::stringstream() << std::hex << CHUNK_SIZE)).str() + "\r\n";
+			else
+				number = "\r\n" + (static_cast<std::stringstream const&>(std::stringstream() << std::hex << CHUNK_SIZE)).str() + "\r\n";
+			body.insert(index, number);
+			index += CHUNK_SIZE;
+			index += number.length();
+			length += number.length();
+		} else {
+			number = "\r\n" + (static_cast<std::stringstream const&>(std::stringstream() << std::hex << length - index)).str() + "\r\n";
+			body.insert(index, number);
+			index += length - index;
+		}
 	}
+	body += "\r\n0\r\n\r\n";
+	return (body);
 }
 
-std::string Response::makeHeader(std::string &uri, std::string &src, const std::string& code, const std::string& type)
+std::string Response::makeHeader(std::string &uri, std::string &body, const std::string& code, const std::string& type)
 {
 	std::string header;
 	header += "HTTP/1.1 ";
 	header += code;
 	header += "\r\n";
 	header += "Connection: Keep-Alive\r\n";
-	if (src.length() < CHUNK_SIZE) {
+	if (body.length() < CHUNK_SIZE) {
 		header += "Content-Length: ";
 		header += std::to_string(_messageLength);
 		header += "\r\n";
 	} else {
 		header += "Transfer-Encoding: chunked\r\n";
+		body = makeChunkBody(body);
 	}
 	if (!type.empty())
 		header += "Content-Type: " + type;
@@ -154,7 +173,7 @@ std::string Response::makeHeader(std::string &uri, std::string &src, const std::
 	header += "Last-Modified: ";
 	header += getdate();
 	header += "\r\n";
-	header += src;
+	header += body;
 	_messageLength += header.length();
 	return header;
 }

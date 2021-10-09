@@ -85,6 +85,8 @@ void Server::sendEvent(Client & connection) {
 			if (_clients[i]->getSocket() == connection.getSocket())
 				disconnectEvent(connection, i);
 		}
+	} else if (ret == Client::ERROR) {
+		exceptionEvent(connection, std::exception());
 	}
 }
 void Server::exceptionEvent(Client & connection, std::exception e) {

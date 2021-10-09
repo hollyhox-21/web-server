@@ -20,7 +20,8 @@ class Client {
 			BODY,
 			SEND,
 			END,
-			CLOSE
+			CLOSE,
+			ERROR
 		};
 
 		Client(int socket);
@@ -37,10 +38,12 @@ class Client {
 		STATE			getState();
 		Request*		getRequest() { return _req; }
 		void			setResponse(t_server &serverSettings);
+		void			setState(STATE state);
 
 	private:
 		STATE			_state;
 		int				_socket;
+		unsigned long	_messageLength;
 		char			_buffer[BUFFER_SIZE + 1];
 		std::string		_header;
 		std::string		_body;

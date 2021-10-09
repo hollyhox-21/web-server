@@ -3,9 +3,17 @@
 Client::Client(int socket) {
 	_socket = socket;
 	_state = END;
+	_req = NULL;
+	_res = NULL;
 }
 
 Client::~Client() {
+	if (_req) {
+		delete (_req);
+	}
+	if (_res) {
+		delete (_res);
+	}
 	close(_socket);
 }
 
@@ -17,7 +25,14 @@ Client::STATE Client::start() {
 
 Client::STATE Client::end() {
 	_state = END;
-	delete(_res);
+	if (_req) {
+		delete (_req);
+		_req = NULL;
+	}
+	if (_res) {
+		delete (_res);
+		_res = NULL;
+	}
 	_header.clear();
 	_body.clear();
 	_chunkedBody.clear();
@@ -133,12 +148,21 @@ Client::STATE		Client::sendMsg() {
 		} else {
 			result = send(_socket, message, messageLength, 0);
 		}
-		std::cout << "res: " << result << std::endl;
+		if (result == 0) {
+			return (CLOSE);
+		} if (result < 0) {
+			end();
+			return (ERROR);
+		}
 		_res->setMessage(strdup(message + result));
 		_res->setMessageLength(messageLength - result);
+		std::cout << "res: " << result << std::endl << message << std::endl;
 
 	}
-	if (_res->getMessageLength() == 0) {
+	if (messageLength == 0) {
+		// while (true) {
+		// 	;
+		// }
 		return end();
 	}
 	return _state;
@@ -155,4 +179,8 @@ Client::STATE		Client::getState() {
 
 void	Client::setResponse(t_server &serverSettings) {
 	_res = new Response(*_req, serverSettings);
+}
+
+void	Client::setState(STATE state) {
+	_state = state;
 }

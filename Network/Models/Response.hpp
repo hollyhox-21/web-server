@@ -44,8 +44,8 @@ private:
 	void createSrc(std::map<std::string, Location>::iterator it, const std::string&);
 	void createCgiResponse(std::string &uri);
 	void createResponseWOCgi(std::string &uri, std::string code);
-	std::string makeHeader(std::string &uri, std::string &src, const std::string& code, const std::string& type);
-	std::string & makeChunkBody(std::string &body);
+	std::string makeHeader(std::string &uri, std::string &body, const std::string& code, const std::string& type);
+	std::string &makeChunkBody(std::string &body);
 	static std::string getdate();
 	void	generateResponse(std::string uri, std::map<std::string, Location>::iterator it);
 	void	genetateResponseAutoIn(DIR *dir, struct dirent *ent, std::string src, std::ifstream &file, std::string path);
